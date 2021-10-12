@@ -6,5 +6,5 @@
 * Tobiasz Piwowarczyk
 * Wiktor Dmitruk
 
-## Etap 1
-[a relative link](./Documentation/Etap_01_FINAL.pdf)
+## Etapy realizacji projektu
+[Etap 1 - Analiza Stanu Zastanego](./Documentation/Etap_01_FINAL.pdf)

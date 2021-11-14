@@ -53,6 +53,12 @@ namespace API
 
             app.UseRouting();
 
+            // TODO: Setup Cors for React app on localhost below
+            // app.UseCors(policy =>
+            //     policy.AllowAnyHeader()
+            //           .AllowAnyMethod()
+            //           .WithOrigins("https://localhost:4200"));
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

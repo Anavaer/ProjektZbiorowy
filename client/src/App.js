@@ -10,8 +10,7 @@ function App() {
     apiService.getSampleData().then(response => setSampleData(response.data));
   }, [])
 
-console.log(sampleData)
-  return (
+  return sampleData && (
     <div className="App">
       <header className="App-header">
         <p>Adres: {sampleData.address}</p>

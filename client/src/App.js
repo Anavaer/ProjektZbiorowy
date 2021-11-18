@@ -17,7 +17,7 @@ function App() {
         <p>Miasto: {sampleData.city}</p>
         <p>Nazwa firmy: {sampleData.companyName}</p>
         <p>Imię: {sampleData.firstName}</p>
-        <p>Nazwisko: {sampleData.LastName}</p>
+        <p>Nazwisko: {sampleData.lastName}</p>
         <p>NIP: {sampleData.nip}</p>
       </header>
     </div>

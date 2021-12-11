@@ -6,20 +6,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Linq;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace API.Services
 {
     public class JwtTokenService : IJwtTokenService
     {
-        private readonly SymmetricSecurityKey securityKey;
+        private readonly SymmetricSecurityKey key;
         private readonly UserManager<User> userManager;
 
-        public JwtTokenService(UserManager<User> userManager)
+        public JwtTokenService(UserManager<User> userManager, IConfiguration configuration)
         {
             this.userManager = userManager;
-            this.securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("FQjjBTpMCmaK2QYK8VRP"));
+            this.key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtToken"]));
         }
 
         public async Task<string> NewJwtToken(User user)
@@ -40,7 +40,7 @@ namespace API.Services
             return jwtHandler.WriteToken(jwtHandler.CreateToken(new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature),
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature),
                 Expires = DateTime.Now.AddMinutes(15)
             }));
         }

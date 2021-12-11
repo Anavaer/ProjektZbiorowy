@@ -23,5 +23,7 @@ namespace API.Controllers
             var user = await dataContext.Users.FirstOrDefaultAsync();
             return Ok(user);
         }
+
+        
     }
 }

@@ -26,7 +26,7 @@ namespace API
             catch (Exception e)
             {
                 services.GetRequiredService<ILogger<Program>>()
-                        .LogError(e, "Error occurred during migration or data seed.");
+                        .LogError(e, "Error has occuring when performing migration or seeding data.");
             }
             await host.RunAsync();
         }

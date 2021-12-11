@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel;
-using API.DataModel.Entities;
+using API.DataModel.Entities.AspNetIdentity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

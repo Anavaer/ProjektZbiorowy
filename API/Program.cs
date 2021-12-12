@@ -21,7 +21,8 @@ namespace API
             {
                 await services.GetRequiredService<DataContext>().Database.MigrateAsync();
                 await DataSeeder.Seed(services.GetRequiredService<UserManager<User>>(),
-                                      services.GetRequiredService<RoleManager<Role>>());
+                                      services.GetRequiredService<RoleManager<Role>>(),
+                                      services.GetRequiredService<DataContext>());
             }
             catch (Exception e)
             {

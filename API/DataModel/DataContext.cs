@@ -1,3 +1,4 @@
+using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -11,6 +12,8 @@ namespace API.DataModel
         public DataContext(DbContextOptions options) : base(options)
         {
         }
+
+        public DbSet<ServicePrice> ServicePrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -1,11 +1,9 @@
 using System.Threading.Tasks;
-using API.DataModel;
 using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
 using API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -56,10 +54,26 @@ namespace API.Controllers
             });
         }
 
-        // [HttpPost("sign-in")]
-        // public async Task<ActionResult<IdentityDto>> SignIn()
-        // {
-        //     return Ok();
-        // }
+        [HttpPost("sign-in")]
+        public async Task<ActionResult<IdentityDto>> SignIn(SignInDto signInDto)
+        {
+            var user = await this.userManager.FindByNameAsync(signInDto.Username);
+
+            if (user == null)
+            {
+                return Unauthorized("User with this username does not exist.");
+            }
+
+            if (!(await this.signInManager.CheckPasswordSignInAsync(user, signInDto.Password, lockoutOnFailure: false)).Succeeded)
+            {
+                return Unauthorized("Invalid password has been entered.");
+            }
+
+            return Ok(new IdentityDto
+            {
+                Username = user.UserName,
+                Token = await this.jwtTokenService.NewJwtToken(user)
+            });
+        }
     }
 }

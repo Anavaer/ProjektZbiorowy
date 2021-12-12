@@ -1,7 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel;
+using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
+using API.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -103,7 +105,48 @@ namespace API.Controllers
             }).ToListAsync());
         }
 
-        // AddService
-        // EditService
+        [HttpPost("add-service")]
+        public async Task<ActionResult> AddService(ServiceAddAndEditDto serviceDto)
+        {
+            var service = new ServicePrice
+            {
+                Description = serviceDto.Description,
+                UnitPrice = serviceDto.UnitPrice,
+                PriceRatio = serviceDto.PriceRatio
+            };
+
+            await this.dataContext.ServicePrices.AddAsync(service);
+
+            if (!(await dataContext.SaveChangesAsync() > 0))
+            {
+                return BadRequest("Error has occurred when adding service.");
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("edit-service/{id}")]
+        public async Task<ActionResult> EditService(int id, ServiceAddAndEditDto serviceDto)
+        {
+            var service = await dataContext.ServicePrices.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (service == null)
+            {
+                return NotFound("Service not found.");
+            }
+
+            service.Description = serviceDto.Description;
+            service.UnitPrice = service.UnitPrice;
+            service.PriceRatio = service.PriceRatio;
+
+            this.dataContext.ServicePrices.Update(service);
+
+            if (!(await dataContext.SaveChangesAsync() > 0))
+            {
+                return BadRequest("Error has occurred when editing service.");
+            }
+
+            return NoContent();
+        }
     }
 }

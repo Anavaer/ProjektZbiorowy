@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.DTO
 {
-    public class ServiceCreateAndUpdateDto
+    public class ServiceAddAndEditDto
     {
         [Required]
         [MaxLength(50)]

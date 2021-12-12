@@ -61,10 +61,10 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("edit-role/{id}")]
-        public async Task<ActionResult> EditRole(int userId, [FromQuery] string roles)
+        [HttpPut("edit-role/{id}")]
+        public async Task<ActionResult> EditRole(int id, [FromQuery] string roles)
         {
-            var user = await this.userManager.FindByIdAsync(userId.ToString());
+            var user = await this.userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
             {
@@ -125,7 +125,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPost("edit-service/{id}")]
+        [HttpPut("edit-service/{id}")]
         public async Task<ActionResult> EditService(int id, ServiceAddAndEditDto serviceDto)
         {
             var service = await dataContext.ServicePrices.FirstOrDefaultAsync(s => s.Id == id);

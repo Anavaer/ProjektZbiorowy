@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using API.DataModel;
 using API.DataModel.Entities.AspNetIdentity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<User> userManager;
+        private readonly DataContext dataContext;
 
-        public AdminController(UserManager<User> userManager)
+        public AdminController(UserManager<User> userManager, DataContext dataContext)
         {
             this.userManager = userManager;
+            this.dataContext = dataContext;
         }
 
         [HttpGet("users")]
@@ -88,7 +91,18 @@ namespace API.Controllers
             return NoContent();
         }
 
-        // GetServices
+        [HttpGet("services")]
+        public async Task<ActionResult> GetServices()
+        {
+            return Ok(await this.dataContext.ServicePrices.Select(s => new
+            {
+                s.Id,
+                s.Description,
+                s.UnitPrice,
+                s.PriceRatio
+            }).ToListAsync());
+        }
+
         // AddService
         // EditService
     }

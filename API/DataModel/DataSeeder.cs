@@ -1,45 +1,74 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.DataModel
 {
     public class DataSeeder
     {
-        public static async Task Seed(UserManager<User> userManager, RoleManager<Role> roleManager)
+        public static async Task Seed(UserManager<User> userManager, RoleManager<Role> roleManager, DataContext dataContext)
         {
             await SeedRoles(roleManager);
             await SeedUsers(userManager);
+            await SeedServicePrices(dataContext);
+        }
+
+        private static async Task SeedServicePrices(DataContext dataContext)
+        {
+            if (!(await dataContext.ServicePrices.AnyAsync()))
+            {
+                var servicePrices = new List<ServicePrice>
+                {
+                    new ServicePrice { Description = "Dummy Service 01", UnitPrice = 3.5F, PriceRatio = 2.0F },
+                    new ServicePrice { Description = "Dummy Service 02", UnitPrice = 2.7F, PriceRatio = 1.8F },
+                    new ServicePrice { Description = "Dummy Service 03", UnitPrice = 1.5F, PriceRatio = 0.75F }
+                };
+
+                foreach (var servicePrice in servicePrices)
+                {
+                    await dataContext.ServicePrices.AddAsync(servicePrice);
+                }
+
+                await dataContext.SaveChangesAsync();
+            }
         }
 
         private static async Task SeedUsers(UserManager<User> userManager)
         {
-            var client = new User { UserName = "client" };
-            await userManager.CreateAsync(client, "P@ssw0rd");
-            await userManager.AddToRoleAsync(client, "Client");
+            if (!(await userManager.Users.AnyAsync()))
+            {
+                var client = new User { UserName = "client" };
+                await userManager.CreateAsync(client, "P@ssw0rd");
+                await userManager.AddToRoleAsync(client, "Client");
 
-            var worker = new User { UserName = "worker" };
-            await userManager.CreateAsync(worker, "P@ssw0rd");
-            await userManager.AddToRolesAsync(worker, new[] { "Client", "Worker" });
+                var worker = new User { UserName = "worker" };
+                await userManager.CreateAsync(worker, "P@ssw0rd");
+                await userManager.AddToRolesAsync(worker, new[] { "Client", "Worker" });
 
-            var admin = new User { UserName = "admin" };
-            await userManager.CreateAsync(admin, "P@ssw0rd");
-            await userManager.AddToRolesAsync(admin, new[] { "Client", "Worker", "Administrator" });
+                var admin = new User { UserName = "admin" };
+                await userManager.CreateAsync(admin, "P@ssw0rd");
+                await userManager.AddToRolesAsync(admin, new[] { "Client", "Worker", "Administrator" });
+            }
         }
 
         private static async Task SeedRoles(RoleManager<Role> roleManager)
         {
-            var roles = new List<Role>
+            if (!(await roleManager.Roles.AnyAsync()))
             {
-                new Role { Name = "Client" },
-                new Role { Name = "Worker" },
-                new Role { Name = "Administrator" }
-            };
+                var roles = new List<Role>
+                {
+                    new Role { Name = "Client" },
+                    new Role { Name = "Worker" },
+                    new Role { Name = "Administrator" }
+                };
 
-            foreach (var role in roles)
-            {
-                await roleManager.CreateAsync(role);
+                foreach (var role in roles)
+                {
+                    await roleManager.CreateAsync(role);
+                }
             }
         }
     }

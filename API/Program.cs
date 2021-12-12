@@ -1,9 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using API.DataModel;
+using API.DataModel.Entities.AspNetIdentity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -11,9 +13,22 @@ namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            var services = host.Services.CreateScope().ServiceProvider;
+            try
+            {
+                await services.GetRequiredService<DataContext>().Database.MigrateAsync();
+                await DataSeeder.Seed(services.GetRequiredService<UserManager<User>>(),
+                                      services.GetRequiredService<RoleManager<Role>>());
+            }
+            catch (Exception e)
+            {
+                services.GetRequiredService<ILogger<Program>>()
+                        .LogError(e, "Error has occuring when performing migration or seeding data.");
+            }
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

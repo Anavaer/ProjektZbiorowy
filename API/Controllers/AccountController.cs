@@ -32,7 +32,13 @@ namespace API.Controllers
 
             var user = new User
             {
-                UserName = signUpDto.Username
+                UserName = signUpDto.Username,
+                CompanyName = signUpDto.CompanyName,
+                NIP = signUpDto.NIP,
+                FirstName = signUpDto.FirstName,
+                LastName = signUpDto.LastName,
+                City = signUpDto.City,
+                Address = signUpDto.Address
             };
 
             var signUpResult = await this.userManager.CreateAsync(user, signUpDto.Password);

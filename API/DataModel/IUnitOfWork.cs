@@ -10,10 +10,8 @@ namespace API.DataModel
     public interface IUnitOfWork
         {
             IGenericRepo<TEntity> Repo<TEntity>() where TEntity : class;
-            Task Save();
+            Task<Boolean> Save();
             void Dispose();
-
-
      }
     
 }

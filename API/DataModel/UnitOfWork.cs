@@ -21,9 +21,9 @@ namespace API.DataModel
             repositories.Add(typeof(TEntity), repo);
             return repo;
         }
-        public async Task Save()
+        public async Task<Boolean> Save()
         {
-            await context.SaveChangesAsync();
+            return await context.SaveChangesAsync()>0;
         }
         private bool disposed = false;
         protected virtual void Dispose(bool disposing)

@@ -9,11 +9,11 @@ namespace API.DataModel.Entities
 {
     public class OrderStatus
     {
-        [Key]
+        
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderStatusId { get; set;}
         [MaxLength(50)]
         [Required]
-        public string Description { get; set;}
+        public string Description { get; set;}              
     }
 }

@@ -24,7 +24,6 @@ namespace API.DataModel
              Expression<Func<TEntity, bool>> filter = null,
              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
              Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes = null
-
              )
         {
             IQueryable<TEntity> query = dbSet;
@@ -51,7 +50,6 @@ namespace API.DataModel
 
         public virtual async Task<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes = null
-
             )
         {
             IQueryable<TEntity> query = dbSet;
@@ -64,11 +62,8 @@ namespace API.DataModel
             if (includes != null)
             {
                 query = includes(query);
-            }
-            if (query.Any())
-                return await query.FirstAsync();
-            else
-                return null;
+            }           
+                return await query.SingleOrDefaultAsync();           
         }
         public virtual async Task<TEntity> Get(int id)
         {
@@ -123,13 +118,7 @@ namespace API.DataModel
         public virtual async Task Update(TEntity entityToUpdate)
         {
             var entry = dbSet.Attach(entityToUpdate);
-            entry.State = EntityState.Modified;
+            entry.State = EntityState.Modified;        
         }
-
-
-
-
-
-    }
-       
-    }
+    }       
+}

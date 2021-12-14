@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel;
 using API.DataModel.Entities;
@@ -10,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    // TODO: Add Authorize attributes according to Roles
     [ApiController]
     [Route("api/[controller]")]
     public class OrdersController : ControllerBase

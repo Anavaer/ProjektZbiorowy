@@ -15,12 +15,14 @@ namespace API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<User> userManager;
-        private readonly DataContext dataContext;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly IGenericRepo<ServicePrice> servicesRepo;
 
-        public AdminController(UserManager<User> userManager, DataContext dataContext)
+        public AdminController(UserManager<User> userManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
-            this.dataContext = dataContext;
+            this.unitOfWork = unitOfWork;
+            this.servicesRepo = this.unitOfWork.Repo<ServicePrice>();
         }
 
         [HttpGet("users")]
@@ -96,13 +98,13 @@ namespace API.Controllers
         [HttpGet("services")]
         public async Task<ActionResult> GetServices()
         {
-            return Ok(await this.dataContext.ServicePrices.Select(s => new
+            return Ok((await servicesRepo.GetAll()).Select(s => new
             {
                 s.Id,
                 s.Description,
                 s.UnitPrice,
                 s.PriceRatio
-            }).ToListAsync());
+            }).ToList());
         }
 
         [HttpPost("add-service")]
@@ -115,9 +117,9 @@ namespace API.Controllers
                 PriceRatio = serviceDto.PriceRatio
             };
 
-            await this.dataContext.ServicePrices.AddAsync(service);
+            await servicesRepo.Insert(service);
 
-            if (!(await dataContext.SaveChangesAsync() > 0))
+            if (!(await this.unitOfWork.Save()))
             {
                 return BadRequest("Error has occurred when adding service.");
             }
@@ -128,7 +130,7 @@ namespace API.Controllers
         [HttpPut("edit-service/{id}")]
         public async Task<ActionResult> EditService(int id, ServiceAddAndEditDto serviceDto)
         {
-            var service = await dataContext.ServicePrices.FirstOrDefaultAsync(s => s.Id == id);
+            var service = await servicesRepo.Get(s => s.Id == id);
 
             if (service == null)
             {
@@ -139,9 +141,9 @@ namespace API.Controllers
             service.UnitPrice = service.UnitPrice;
             service.PriceRatio = service.PriceRatio;
 
-            this.dataContext.ServicePrices.Update(service);
+            await this.servicesRepo.Update(service);
 
-            if (!(await dataContext.SaveChangesAsync() > 0))
+            if (!(await this.unitOfWork.Save()))
             {
                 return BadRequest("Error has occurred when editing service.");
             }

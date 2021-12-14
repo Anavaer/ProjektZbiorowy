@@ -23,7 +23,7 @@ namespace API.DataModel
         }
         public async Task<Boolean> Save()
         {
-            return await context.SaveChangesAsync()>0;
+            return await context.SaveChangesAsync() > 0;
         }
         private bool disposed = false;
         protected virtual void Dispose(bool disposing)

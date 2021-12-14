@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.DataModel;
 using API.DataModel.Entities;
 using API.DTO;
+using API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -44,7 +45,10 @@ namespace API.Controllers
         [HttpPost("orders/create")]
         public async Task<ActionResult> CreateOrder(OrderDto orderDto)
         {
-            // trzeba ustawic status na NEW przy tworzeniu
+            // Zalogowany uzytkownik powinien byc automatycznie ustawiany jako klient w zamowieniu
+            var clientId = User.GetId();
+            // trzeba ustawic status na NEW przy tworzeniu 
+
             if (!(await this.unitOfWork.Save()))
             {
                 return BadRequest("Error has occurred when creating order.");

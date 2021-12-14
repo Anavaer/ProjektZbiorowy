@@ -98,7 +98,7 @@ namespace API.Controllers
         [HttpGet("services")]
         public async Task<ActionResult> GetServices()
         {
-            return Ok((await servicesRepo.GetAll()).Select(s => new
+            return Ok((await this.servicesRepo.GetAll()).Select(s => new
             {
                 s.Id,
                 s.Description,
@@ -117,7 +117,7 @@ namespace API.Controllers
                 PriceRatio = serviceDto.PriceRatio
             };
 
-            await servicesRepo.Insert(service);
+            await this.servicesRepo.Insert(service);
 
             if (!(await this.unitOfWork.Save()))
             {
@@ -130,7 +130,7 @@ namespace API.Controllers
         [HttpPut("edit-service/{id}")]
         public async Task<ActionResult> EditService(int id, ServiceAddAndEditDto serviceDto)
         {
-            var service = await servicesRepo.Get(s => s.Id == id);
+            var service = await this.servicesRepo.Get(s => s.Id == id);
 
             if (service == null)
             {

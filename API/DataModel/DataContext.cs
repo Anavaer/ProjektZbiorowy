@@ -14,7 +14,6 @@ namespace API.DataModel
         }
 
         public DbSet<ServicePrice> ServicePrices { get; set; }
-
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderToServicePrice> OrderToServicePrices { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
@@ -31,22 +30,18 @@ namespace API.DataModel
             builder.Entity<Role>().HasMany(r => r.UserRoles).WithOne(r => r.Role)
                                   .HasForeignKey(r => r.RoleId).IsRequired();
 
-            //clustered keys
+            // Clustered keys
             builder.Entity<OrderToServicePrice>()
-                   .HasKey(c => new { c.OrderId, c.ServicePriceId});
+                   .HasKey(c => new { c.OrderId, c.ServicePriceId });
 
-            //seed dictionaries
-
+            // Seed dictionaries
             builder.Entity<OrderStatus>().HasData(
-                  new { OrderStatusId = 1, Description=  "NEW"},
+                  new { OrderStatusId = 1, Description = "NEW" },
                   new { OrderStatusId = 2, Description = "CONFIRMED" },
                   new { OrderStatusId = 3, Description = "ONGOING" },
                   new { OrderStatusId = 4, Description = "COMPLETED" },
                   new { OrderStatusId = 5, Description = "CANCELED" }
                   );
-
-
-
         }
     }
 }

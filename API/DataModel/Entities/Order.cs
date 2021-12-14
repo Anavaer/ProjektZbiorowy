@@ -1,16 +1,13 @@
 ﻿using API.DataModel.Entities.AspNetIdentity;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.DataModel.Entities
 {
     public class Order
     {
-      
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
         [ForeignKey("User")]
@@ -25,9 +22,10 @@ namespace API.DataModel.Entities
         [Required]
         public int Area { get; set; }
         [ForeignKey("User")]
-        public int EmployeeId { get; set;}
-        //--------------------------------Navigation-------------------------
-        public virtual User Client{ get; set; }
+        public int EmployeeId { get; set; }
+
+        // Navigation Properties
+        public virtual User Client { get; set; }
         public virtual OrderStatus OrderStatus { get; set; }
         public virtual User Employee { get; set; }
     }

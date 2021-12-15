@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using API.DataModel;
 using API.DataModel.Entities;
+using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
 using API.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -14,11 +16,15 @@ namespace API.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IGenericRepo<Order> ordersRepo;
+        private readonly IGenericRepo<User> usersRepo;
+        private readonly IGenericRepo<OrderStatus> statusesRepo;
 
         public OrdersController(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
             this.ordersRepo = this.unitOfWork.Repo<Order>();
+            this.usersRepo = this.unitOfWork.Repo<User>();
+            this.statusesRepo = this.unitOfWork.Repo<OrderStatus>();
         }
 
         // GetOrders
@@ -40,23 +46,32 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpPost("orders/create")]
+        [HttpPost("create")]
+        [Authorize(Roles = "Client")]
         public async Task<ActionResult> CreateOrder(OrderDto orderDto)
         {
-            // Zalogowany uzytkownik powinien byc automatycznie ustawiany jako klient w zamowieniu
-            var clientId = User.GetId();
-            // trzeba ustawic status na NEW przy tworzeniu
-            var order = new Order
+            if (orderDto.ServiceDates.Count < 1)
             {
-                ClientId = User.GetId(),
-                ServiceDate = orderDto.ServiceDates[0],
-                OrderStatusId = 1,
-                City = orderDto.City,
-                Address = orderDto.Address,
-                Area = orderDto.Area
-            };
+                return BadRequest("Please pick at least one service date.");
+            }
 
-            await this.ordersRepo.Insert(order);
+            var client = await usersRepo.Get(u => u.Id == User.GetId());
+            var statusNew = await statusesRepo.Get(s => s.Description == "NEW");
+
+            foreach (var date in orderDto.ServiceDates)
+            {
+                await this.ordersRepo.Insert(new Order
+                {
+                    Client = client,
+                    ClientId = client.Id,
+                    ServiceDate = date,
+                    OrderStatus = statusNew,
+                    OrderStatusId = statusNew.OrderStatusId,
+                    City = orderDto.City,
+                    Address = orderDto.Address,
+                    Area = orderDto.Area
+                });
+            }
 
             if (!(await this.unitOfWork.Save()))
             {

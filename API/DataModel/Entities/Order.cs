@@ -1,4 +1,5 @@
 ﻿using API.DataModel.Entities.AspNetIdentity;
+using API.Utils;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,7 +23,7 @@ namespace API.DataModel.Entities
         [Required]
         public int Area { get; set; }
         [ForeignKey("User")]
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
 
         // Navigation Properties
         public virtual User Client { get; set; }

@@ -45,7 +45,18 @@ namespace API.Controllers
         {
             // Zalogowany uzytkownik powinien byc automatycznie ustawiany jako klient w zamowieniu
             var clientId = User.GetId();
-            // trzeba ustawic status na NEW przy tworzeniu 
+            // trzeba ustawic status na NEW przy tworzeniu
+            var order = new Order
+            {
+                ClientId = User.GetId(),
+                ServiceDate = orderDto.ServiceDates[0],
+                OrderStatusId = 1,
+                City = orderDto.City,
+                Address = orderDto.Address,
+                Area = orderDto.Area
+            };
+
+            await this.ordersRepo.Insert(order);
 
             if (!(await this.unitOfWork.Save()))
             {

@@ -9,6 +9,7 @@ using API.DTO;
 using API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -88,14 +89,52 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/assign/{employeeId}")]
-        public async Task<ActionResult> AssignOrder(int id, int? employeeId = null)
+        [HttpPut("assign/{id}")]
+        [Authorize(Roles = "Worker,Administrator")]
+        public async Task<ActionResult> AssignOrder(int id, [FromQuery] int? employeeId = null)
         {
-            // Admin moze podac employeeId
-            // Worker jest automatycznie ustawiany jak zawola ta metode, niezaleznie od podanego employeeId?
-            // Zamowienie nie moze zostac przypisane do Workera, jesli tez jest klientem danego zamowienia
-            // Zamowienie moze byc przypisane tylko jezeli jest NEW
-            // trzeba ustawic status na CONFIRMED przy przypisaniu
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            else if (order.OrderStatus.Description != "NEW")
+            {
+                return BadRequest("Only orders in status 'NEW' can be assigned.");
+            }
+            else if (order.ClientId == employeeId)
+            {
+                return BadRequest("Order's client cannot be assigned as a worker.");
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                var employee = await usersRepo.Get(filter: u => u.Id == employeeId,
+                                                   includes: u => u.Include(r => r.UserRoles)
+                                                                   .ThenInclude(r => r.Role));
+
+                if (employee == null || employee.UserRoles.FirstOrDefault(r => r.Role.Name == "Worker") == null)
+                {
+                    return BadRequest("Invalid EmployeeId.");
+                }
+
+                order.Employee = employee;
+            }
+            else if (User.IsInRole("Worker"))
+            {
+                var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+                if (order.ClientId == currentUser.Id)
+                {
+                    return BadRequest("Order's client cannot be assigned as a worker.");
+                }
+
+                order.Employee = currentUser;
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CONFIRMED");
+
             if (!(await this.unitOfWork.Save()))
             {
                 return BadRequest("Error has occurred when changing status to CONFIRMED.");

@@ -1,6 +1,7 @@
 ﻿using API.DataModel.Entities.AspNetIdentity;
 using API.Utils;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +9,7 @@ namespace API.DataModel.Entities
 {
     public class Order
     {
-
+        // TODO: Add relation to ServicePrices and TotalPrice property
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
         [ForeignKey("User")]
@@ -24,10 +25,13 @@ namespace API.DataModel.Entities
         public int Area { get; set; }
         [ForeignKey("User")]
         public int? EmployeeId { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public float TotalPrice { get; set; }
 
         // Navigation Properties
         public virtual User Client { get; set; }
         public virtual OrderStatus OrderStatus { get; set; }
         public virtual User Employee { get; set; }
+        public virtual ICollection<OrderToServicePrice> OrderToServicePrice { get; set; }
     }
 }

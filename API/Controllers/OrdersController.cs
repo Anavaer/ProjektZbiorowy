@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel;
 using API.DataModel.Entities;
@@ -18,6 +21,7 @@ namespace API.Controllers
         private readonly IGenericRepo<Order> ordersRepo;
         private readonly IGenericRepo<User> usersRepo;
         private readonly IGenericRepo<OrderStatus> statusesRepo;
+        private readonly IGenericRepo<ServicePrice> servicesRepo;
 
         public OrdersController(IUnitOfWork unitOfWork)
         {
@@ -25,6 +29,7 @@ namespace API.Controllers
             this.ordersRepo = this.unitOfWork.Repo<Order>();
             this.usersRepo = this.unitOfWork.Repo<User>();
             this.statusesRepo = this.unitOfWork.Repo<OrderStatus>();
+            this.servicesRepo = this.unitOfWork.Repo<ServicePrice>();
         }
 
         // GetOrders
@@ -50,9 +55,10 @@ namespace API.Controllers
         [Authorize(Roles = "Client")]
         public async Task<ActionResult> CreateOrder(OrderDto orderDto)
         {
-            if (orderDto.ServiceDates.Count < 1)
+            var services = await servicesRepo.GetAll(service => orderDto.ServicePriceIds.Contains(service.Id));
+            if (services.Count() < 1)
             {
-                return BadRequest("Please pick at least one service date.");
+                return BadRequest("Invalid services selected.");
             }
 
             var client = await usersRepo.Get(u => u.Id == User.GetId());
@@ -60,7 +66,7 @@ namespace API.Controllers
 
             foreach (var date in orderDto.ServiceDates)
             {
-                await this.ordersRepo.Insert(new Order
+                var order = new Order
                 {
                     Client = client,
                     ClientId = client.Id,
@@ -69,8 +75,11 @@ namespace API.Controllers
                     OrderStatusId = statusNew.OrderStatusId,
                     City = orderDto.City,
                     Address = orderDto.Address,
-                    Area = orderDto.Area
-                });
+                    Area = orderDto.Area,
+                    TotalPrice = calculateTotalPrice(orderDto.Area, services)
+                };
+
+                await this.ordersRepo.Insert(order);
             }
 
             if (!(await this.unitOfWork.Save()))
@@ -137,6 +146,17 @@ namespace API.Controllers
             }
 
             return NoContent();
+        }
+
+
+        private float calculateTotalPrice(int area, IEnumerable<ServicePrice> services)
+        {
+            float totalPrice = 0;
+            foreach (var service in services)
+            {
+                totalPrice += ((area * service.PriceRatio) * service.UnitPrice);
+            }
+            return totalPrice;
         }
     }
 }

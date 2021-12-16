@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using API.Utils;
+using API.Utils.CustomValidation;
 
 namespace API.DTO
 {
@@ -18,5 +19,8 @@ namespace API.DTO
         public string Address { get; set; }
         [Required]
         public int Area { get; set; }
+        [Required]
+        [ListNotEmpty(ErrorMessage = "ServicePriceIds cannot be empty.")]
+        public List<int> ServicePriceIds { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.DataModel.Entities.AspNetIdentity
+namespace API.DataModel.Entities
 {
     public class OrderToServicePrice
     {

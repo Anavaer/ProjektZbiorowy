@@ -9,7 +9,6 @@ namespace API.DataModel.Entities
 {
     public class Order
     {
-        // TODO: Add relation to ServicePrices and TotalPrice property
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
         [ForeignKey("User")]
@@ -32,6 +31,6 @@ namespace API.DataModel.Entities
         public virtual User Client { get; set; }
         public virtual OrderStatus OrderStatus { get; set; }
         public virtual User Employee { get; set; }
-        public virtual ICollection<OrderToServicePrice> OrderToServicePrice { get; set; }
+        public virtual ICollection<ServicePrice> ServicePrices { get; set; }
     }
 }

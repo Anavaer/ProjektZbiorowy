@@ -18,9 +18,9 @@ namespace API.DTO
         [Required]
         public string Address { get; set; }
         [Required]
+        [IntGreaterOrEqualTo(2)]
         public int Area { get; set; }
-        [Required]
-        [ListNotEmpty(ErrorMessage = "ServicePriceIds cannot be empty.")]
+        [ListRequiredAndNotEmpty(ErrorMessage = "ServicePriceIds cannot be empty.")]
         public List<int> ServicePriceIds { get; set; }
     }
 }

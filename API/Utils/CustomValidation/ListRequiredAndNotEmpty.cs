@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations;
 namespace API.Utils.CustomValidation
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class ListNotEmpty : ValidationAttribute
+    public class ListRequiredAndNotEmpty : ValidationAttribute
     {
 
-        public ListNotEmpty() { }
+        public ListRequiredAndNotEmpty() { }
 
         public override bool IsValid(object value)
         {

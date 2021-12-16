@@ -17,6 +17,6 @@ namespace API.DataModel.Entities
         [Column(TypeName = "decimal(10,2)")]
         public float PriceRatio { get; set; }
 
-        public virtual ICollection<OrderToServicePrice> OrderToServicePrice { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

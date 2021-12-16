@@ -58,7 +58,7 @@ namespace API.Controllers
             var services = await servicesRepo.GetAll(service => orderDto.ServicePriceIds.Contains(service.Id));
             if (services.Count() < 1)
             {
-                return BadRequest("Invalid services selected.");
+                return BadRequest("All selected services are invalid.");
             }
 
             var client = await usersRepo.Get(u => u.Id == User.GetId());
@@ -66,7 +66,7 @@ namespace API.Controllers
 
             foreach (var date in orderDto.ServiceDates)
             {
-                var order = new Order
+                await this.ordersRepo.Insert(new Order
                 {
                     Client = client,
                     ClientId = client.Id,
@@ -76,10 +76,9 @@ namespace API.Controllers
                     City = orderDto.City,
                     Address = orderDto.Address,
                     Area = orderDto.Area,
-                    TotalPrice = calculateTotalPrice(orderDto.Area, services)
-                };
-
-                await this.ordersRepo.Insert(order);
+                    TotalPrice = calculateTotalPrice(orderDto.Area, services),
+                    ServicePrices = (ICollection<ServicePrice>)services
+                });
             }
 
             if (!(await this.unitOfWork.Save()))

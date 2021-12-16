@@ -33,7 +33,7 @@ namespace API.Controllers
         }
 
         // GetOrders
-        [HttpGet("orders")]
+        [HttpGet]
         public async Task<ActionResult> GetOrders()
         {
             // admin wszystkie
@@ -42,7 +42,7 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpGet("orders/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult> GetOrder(int id)
         {
             // admin wszystkie
@@ -89,7 +89,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("orders/{id}/assign/{employeeId}")]
+        [HttpPut("{id}/assign/{employeeId}")]
         public async Task<ActionResult> AssignOrder(int id, int? employeeId = null)
         {
             // Admin moze podac employeeId
@@ -105,7 +105,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("orders/{id}/cancel")]
+        [HttpPut("cancel/{id}")]
         public async Task<ActionResult> CancelOrder(int id)
         {
             // Zamowienie moze byc anulowane tylko przez klienta
@@ -119,7 +119,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("orders/{id}/start")]
+        [HttpPut("start/{id}")]
         public async Task<ActionResult> StartOrder(int id)
         {
             // Zamowienie moze byc wystartowane tylko przez przypisanego workera
@@ -133,7 +133,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("orders/{id}/complete")]
+        [HttpPut("complete/{id}")]
         public async Task<ActionResult> CompleteOrder(int id)
         {
             // Zamowienie moze byc wystartowane tylko przez przypisanego workera

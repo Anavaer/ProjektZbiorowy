@@ -12,9 +12,6 @@ namespace API.DataModel.Entities
         public string Description { get; set; }
         [Required]
         [Column(TypeName = "decimal(10,2)")]
-        public float UnitPrice { get; set; }
-        [Required]
-        [Column(TypeName = "decimal(10,2)")]
         public float PriceRatio { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; }

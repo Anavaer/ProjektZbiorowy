@@ -22,9 +22,9 @@ namespace API.DataModel
             {
                 var servicePrices = new List<ServicePrice>
                 {
-                    new ServicePrice { Description = "Dummy Service 01", UnitPrice = 3.5F, PriceRatio = 2.0F },
-                    new ServicePrice { Description = "Dummy Service 02", UnitPrice = 2.7F, PriceRatio = 1.8F },
-                    new ServicePrice { Description = "Dummy Service 03", UnitPrice = 1.5F, PriceRatio = 0.75F }
+                    new ServicePrice { Description = "Dummy Service 01", PriceRatio = 2.0F },
+                    new ServicePrice { Description = "Dummy Service 02", PriceRatio = 1.8F },
+                    new ServicePrice { Description = "Dummy Service 03", PriceRatio = 0.75F }
                 };
 
                 foreach (var servicePrice in servicePrices)

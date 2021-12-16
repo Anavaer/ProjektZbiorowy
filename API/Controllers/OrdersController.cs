@@ -152,7 +152,7 @@ namespace API.Controllers
             float totalPrice = 0;
             foreach (var service in services)
             {
-                totalPrice += ((area * service.PriceRatio) * service.UnitPrice);
+                totalPrice += (area * service.PriceRatio);
             }
             return totalPrice;
         }

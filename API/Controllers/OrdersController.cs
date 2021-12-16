@@ -32,7 +32,6 @@ namespace API.Controllers
             this.servicesRepo = this.unitOfWork.Repo<ServicePrice>();
         }
 
-        // GetOrders
         [HttpGet]
         public async Task<ActionResult> GetOrders()
         {

@@ -134,11 +134,11 @@ namespace API.Controllers
         }
 
         [HttpPut("cancel/{id}")]
+        [Authorize(Roles = "Client")]
         public async Task<ActionResult> CancelOrder(int id)
         {
             var order = await ordersRepo.Get(filter: o => o.OrderId == id,
-                                             includes: o => o.Include(s => s.OrderStatus)
-                                                             .Include(s => s.Employee));
+                                             includes: o => o.Include(s => s.OrderStatus));
             if (order == null)
             {
                 return BadRequest("Invalid OrderId.");
@@ -161,11 +161,30 @@ namespace API.Controllers
         }
 
         [HttpPut("start/{id}")]
+        [Authorize(Roles = "Worker")]
         public async Task<ActionResult> StartOrder(int id)
         {
-            // Zamowienie moze byc wystartowane tylko przez przypisanego workera
-            // Zamowienie moze byc wystartowane tylko jesli jest CONFIRMED
-            // trzeba ustawic status na ONGOING
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "CONFIRMED")
+            {
+                return BadRequest("Only orders in status 'CONFIRMED' can be started.");
+            }
+
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.EmployeeId != currentUser.Id)
+            {
+                return BadRequest("Order can be started only by assigned employee.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "ONGOING");
+
             return await SaveAndReturnActionResult("Error has occurred when changing status to ONGOING.");
         }
 

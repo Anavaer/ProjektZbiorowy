@@ -81,12 +81,7 @@ namespace API.Controllers
                 });
             }
 
-            if (!(await this.unitOfWork.Save()))
-            {
-                return BadRequest("Error has occurred when creating order.");
-            }
-
-            return NoContent();
+            return await SaveAndReturnActionResult("Error has occurred when creating order.");
         }
 
         [HttpPut("assign/{id}")]
@@ -100,11 +95,11 @@ namespace API.Controllers
             {
                 return BadRequest("Invalid OrderId.");
             }
-            else if (order.OrderStatus.Description != "NEW")
+            if (order.OrderStatus.Description != "NEW")
             {
                 return BadRequest("Only orders in status 'NEW' can be assigned.");
             }
-            else if (order.ClientId == employeeId)
+            if (order.ClientId == employeeId)
             {
                 return BadRequest("Order's client cannot be assigned as a worker.");
             }
@@ -135,12 +130,7 @@ namespace API.Controllers
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "CONFIRMED");
 
-            if (!(await this.unitOfWork.Save()))
-            {
-                return BadRequest("Error has occurred when changing status to CONFIRMED.");
-            }
-
-            return NoContent();
+            return await SaveAndReturnActionResult("Error has occurred when changing status to CONFIRMED.");
         }
 
         [HttpPut("cancel/{id}")]
@@ -149,12 +139,7 @@ namespace API.Controllers
             // Zamowienie moze byc anulowane tylko przez klienta
             // Zamowienie moze byc anulowane tylko jesli jest NEW lub CONFIRMED
             // trzeba ustawic status na CANCELLED
-            if (!(await this.unitOfWork.Save()))
-            {
-                return BadRequest("Error has occurred when changing status to CANCELLED.");
-            }
-
-            return NoContent();
+            return await SaveAndReturnActionResult("Error has occurred when changing status to CANCELLED.");
         }
 
         [HttpPut("start/{id}")]
@@ -163,12 +148,7 @@ namespace API.Controllers
             // Zamowienie moze byc wystartowane tylko przez przypisanego workera
             // Zamowienie moze byc wystartowane tylko jesli jest CONFIRMED
             // trzeba ustawic status na ONGOING
-            if (!(await this.unitOfWork.Save()))
-            {
-                return BadRequest("Error has occurred when changing status to ONGOING.");
-            }
-
-            return NoContent();
+            return await SaveAndReturnActionResult("Error has occurred when changing status to ONGOING.");
         }
 
         [HttpPut("complete/{id}")]
@@ -177,14 +157,19 @@ namespace API.Controllers
             // Zamowienie moze byc wystartowane tylko przez przypisanego workera
             // Zamowienie moze byc wystartowane tylko jesli jest ONGOING
             // trzeba ustawic status na COMPLETED
+            return await SaveAndReturnActionResult("Error has occurred when changing status to COMPLETED.");
+        }
+
+
+        private async Task<ActionResult> SaveAndReturnActionResult(string errorMessageOnFail)
+        {
             if (!(await this.unitOfWork.Save()))
             {
-                return BadRequest("Error has occurred when changing status to COMPLETED.");
+                return BadRequest(errorMessageOnFail);
             }
 
             return NoContent();
         }
-
 
         private float calculateTotalPrice(int area, IEnumerable<ServicePrice> services)
         {
@@ -193,6 +178,7 @@ namespace API.Controllers
             {
                 totalPrice += (area * service.PriceRatio);
             }
+
             return totalPrice;
         }
     }

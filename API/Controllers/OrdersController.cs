@@ -136,9 +136,27 @@ namespace API.Controllers
         [HttpPut("cancel/{id}")]
         public async Task<ActionResult> CancelOrder(int id)
         {
-            // Zamowienie moze byc anulowane tylko przez klienta
-            // Zamowienie moze byc anulowane tylko jesli jest NEW lub CONFIRMED
-            // trzeba ustawic status na CANCELLED
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "NEW" || order.OrderStatus.Description != "CONFIRMED")
+            {
+                return BadRequest("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.");
+            }
+
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.ClientId != currentUser.Id)
+            {
+                return BadRequest("Order can be cancelled only by the client.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELLED");
+
             return await SaveAndReturnActionResult("Error has occurred when changing status to CANCELLED.");
         }
 

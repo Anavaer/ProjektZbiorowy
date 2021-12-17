@@ -189,6 +189,7 @@ namespace API.Controllers
         }
 
         [HttpPut("complete/{id}")]
+        [Authorize(Roles = "Worker")]
         public async Task<ActionResult> CompleteOrder(int id)
         {
             var order = await ordersRepo.Get(filter: o => o.OrderId == id,

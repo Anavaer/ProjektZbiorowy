@@ -1,5 +1,7 @@
 ﻿using API.DataModel.Entities.AspNetIdentity;
+using API.Utils;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,7 +9,6 @@ namespace API.DataModel.Entities
 {
     public class Order
     {
-
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
         [ForeignKey("User")]
@@ -22,11 +23,14 @@ namespace API.DataModel.Entities
         [Required]
         public int Area { get; set; }
         [ForeignKey("User")]
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public float TotalPrice { get; set; }
 
         // Navigation Properties
         public virtual User Client { get; set; }
         public virtual OrderStatus OrderStatus { get; set; }
         public virtual User Employee { get; set; }
+        public virtual ICollection<ServicePrice> ServicePrices { get; set; }
     }
 }

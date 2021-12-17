@@ -3,18 +3,35 @@ using System;
 using API.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211215183430_EmployeeIdFKchangedToNullable")]
+    partial class EmployeeIdFKchangedToNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.12");
+
+            modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.OrderToServicePrice", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ServicePriceId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("OrderId", "ServicePriceId");
+
+                    b.HasIndex("ServicePriceId");
+
+                    b.ToTable("OrderToServicePrices");
+                });
 
             modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.Role", b =>
                 {
@@ -169,9 +186,6 @@ namespace API.Migrations
 
                     b.Property<DateTime>("ServiceDate")
                         .HasColumnType("TEXT");
-
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("OrderId");
 
@@ -333,19 +347,23 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("OrderServicePrice", b =>
+            modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.OrderToServicePrice", b =>
                 {
-                    b.Property<int>("OrdersOrderId")
-                        .HasColumnType("INTEGER");
+                    b.HasOne("API.DataModel.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("ServicePricesId")
-                        .HasColumnType("INTEGER");
+                    b.HasOne("API.DataModel.Entities.ServicePrice", "ServicePrice")
+                        .WithMany()
+                        .HasForeignKey("ServicePriceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasKey("OrdersOrderId", "ServicePricesId");
+                    b.Navigation("Order");
 
-                    b.HasIndex("ServicePricesId");
-
-                    b.ToTable("OrderServicePrice");
+                    b.Navigation("ServicePrice");
                 });
 
             modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.UserRole", b =>
@@ -424,21 +442,6 @@ namespace API.Migrations
                     b.HasOne("API.DataModel.Entities.AspNetIdentity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("OrderServicePrice", b =>
-                {
-                    b.HasOne("API.DataModel.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("API.DataModel.Entities.ServicePrice", null)
-                        .WithMany()
-                        .HasForeignKey("ServicePricesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

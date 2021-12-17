@@ -103,7 +103,6 @@ namespace API.Controllers
             {
                 s.Id,
                 s.Description,
-                s.UnitPrice,
                 s.PriceRatio
             }).ToList());
         }
@@ -114,7 +113,6 @@ namespace API.Controllers
             var service = new ServicePrice
             {
                 Description = serviceDto.Description,
-                UnitPrice = serviceDto.UnitPrice,
                 PriceRatio = serviceDto.PriceRatio
             };
 
@@ -139,7 +137,6 @@ namespace API.Controllers
             }
 
             service.Description = serviceDto.Description;
-            service.UnitPrice = service.UnitPrice;
             service.PriceRatio = service.PriceRatio;
 
             await this.servicesRepo.Update(service);

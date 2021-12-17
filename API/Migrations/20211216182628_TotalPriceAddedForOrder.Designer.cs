@@ -3,14 +3,16 @@ using System;
 using API.DataModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211216182628_TotalPriceAddedForOrder")]
+    partial class TotalPriceAddedForOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +229,21 @@ namespace API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("API.DataModel.Entities.OrderToServicePrice", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ServicePriceId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("OrderId", "ServicePriceId");
+
+                    b.HasIndex("ServicePriceId");
+
+                    b.ToTable("OrderToServicePrices");
+                });
+
             modelBuilder.Entity("API.DataModel.Entities.ServicePrice", b =>
                 {
                     b.Property<int>("Id")
@@ -333,21 +350,6 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("OrderServicePrice", b =>
-                {
-                    b.Property<int>("OrdersOrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ServicePricesId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("OrdersOrderId", "ServicePricesId");
-
-                    b.HasIndex("ServicePricesId");
-
-                    b.ToTable("OrderServicePrice");
-                });
-
             modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.UserRole", b =>
                 {
                     b.HasOne("API.DataModel.Entities.AspNetIdentity.Role", "Role")
@@ -392,6 +394,25 @@ namespace API.Migrations
                     b.Navigation("OrderStatus");
                 });
 
+            modelBuilder.Entity("API.DataModel.Entities.OrderToServicePrice", b =>
+                {
+                    b.HasOne("API.DataModel.Entities.Order", "Order")
+                        .WithMany("OrderToServicePrice")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.DataModel.Entities.ServicePrice", "ServicePrice")
+                        .WithMany("OrderToServicePrice")
+                        .HasForeignKey("ServicePriceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ServicePrice");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.DataModel.Entities.AspNetIdentity.Role", null)
@@ -428,21 +449,6 @@ namespace API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OrderServicePrice", b =>
-                {
-                    b.HasOne("API.DataModel.Entities.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("API.DataModel.Entities.ServicePrice", null)
-                        .WithMany()
-                        .HasForeignKey("ServicePricesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.Role", b =>
                 {
                     b.Navigation("UserRoles");
@@ -451,6 +457,16 @@ namespace API.Migrations
             modelBuilder.Entity("API.DataModel.Entities.AspNetIdentity.User", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("API.DataModel.Entities.Order", b =>
+                {
+                    b.Navigation("OrderToServicePrice");
+                });
+
+            modelBuilder.Entity("API.DataModel.Entities.ServicePrice", b =>
+                {
+                    b.Navigation("OrderToServicePrice");
                 });
 #pragma warning restore 612, 618
         }

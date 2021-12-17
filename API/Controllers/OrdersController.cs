@@ -1,9 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel;
 using API.DataModel.Entities;
+using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
 using API.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -14,15 +20,20 @@ namespace API.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IGenericRepo<Order> ordersRepo;
+        private readonly IGenericRepo<User> usersRepo;
+        private readonly IGenericRepo<OrderStatus> statusesRepo;
+        private readonly IGenericRepo<ServicePrice> servicesRepo;
 
         public OrdersController(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
             this.ordersRepo = this.unitOfWork.Repo<Order>();
+            this.usersRepo = this.unitOfWork.Repo<User>();
+            this.statusesRepo = this.unitOfWork.Repo<OrderStatus>();
+            this.servicesRepo = this.unitOfWork.Repo<ServicePrice>();
         }
 
-        // GetOrders
-        [HttpGet("orders")]
+        [HttpGet]
         public async Task<ActionResult> GetOrders()
         {
             // admin wszystkie
@@ -31,7 +42,7 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpGet("orders/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult> GetOrder(int id)
         {
             // admin wszystkie
@@ -40,77 +51,191 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpPost("orders/create")]
+        [HttpPost("create")]
+        [Authorize(Roles = "Client")]
         public async Task<ActionResult> CreateOrder(OrderDto orderDto)
         {
-            // Zalogowany uzytkownik powinien byc automatycznie ustawiany jako klient w zamowieniu
-            var clientId = User.GetId();
-            // trzeba ustawic status na NEW przy tworzeniu 
-
-            if (!(await this.unitOfWork.Save()))
+            var services = await servicesRepo.GetAll(service => orderDto.ServicePriceIds.Contains(service.Id));
+            if (services.Count() < 1)
             {
-                return BadRequest("Error has occurred when creating order.");
+                return BadRequest("All selected services are invalid.");
             }
 
-            return NoContent();
+            var client = await usersRepo.Get(u => u.Id == User.GetId());
+            var statusNew = await statusesRepo.Get(s => s.Description == "NEW");
+
+            foreach (var date in orderDto.ServiceDates)
+            {
+                await this.ordersRepo.Insert(new Order
+                {
+                    Client = client,
+                    ClientId = client.Id,
+                    ServiceDate = date,
+                    OrderStatus = statusNew,
+                    OrderStatusId = statusNew.OrderStatusId,
+                    City = orderDto.City,
+                    Address = orderDto.Address,
+                    Area = orderDto.Area,
+                    TotalPrice = calculateTotalPrice(orderDto.Area, services),
+                    ServicePrices = (ICollection<ServicePrice>)services
+                });
+            }
+
+            return await SaveAndReturnActionResult("Error has occurred when creating order.");
         }
 
-        [HttpPut("orders/{id}/assign/{employeeId}")]
-        public async Task<ActionResult> AssignOrder(int id, int? employeeId = null)
+        [HttpPut("assign/{id}")]
+        [Authorize(Roles = "Worker,Administrator")]
+        public async Task<ActionResult> AssignOrder(int id, [FromQuery] int? employeeId = null)
         {
-            // Admin moze podac employeeId
-            // Worker jest automatycznie ustawiany jak zawola ta metode, niezaleznie od podanego employeeId?
-            // Zamowienie nie moze zostac przypisane do Workera, jesli tez jest klientem danego zamowienia
-            // Zamowienie moze byc przypisane tylko jezeli jest NEW
-            // trzeba ustawic status na CONFIRMED przy przypisaniu
-            if (!(await this.unitOfWork.Save()))
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
             {
-                return BadRequest("Error has occurred when changing status to CONFIRMED.");
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "NEW")
+            {
+                return BadRequest("Only orders in status 'NEW' can be assigned.");
+            }
+            if (order.ClientId == employeeId)
+            {
+                return BadRequest("Order's client cannot be assigned as a worker.");
             }
 
-            return NoContent();
+            if (User.IsInRole("Administrator"))
+            {
+                var employee = await usersRepo.Get(filter: u => u.Id == employeeId,
+                                                   includes: u => u.Include(r => r.UserRoles)
+                                                                   .ThenInclude(r => r.Role));
+
+                if (employee == null || employee.UserRoles.FirstOrDefault(r => r.Role.Name == "Worker") == null)
+                {
+                    return BadRequest("Invalid EmployeeId.");
+                }
+
+                order.Employee = employee;
+            }
+            else if (User.IsInRole("Worker"))
+            {
+                var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+                if (order.ClientId == currentUser.Id)
+                {
+                    return BadRequest("Order's client cannot be assigned as a worker.");
+                }
+
+                order.Employee = currentUser;
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CONFIRMED");
+
+            return await SaveAndReturnActionResult("Error has occurred when changing status to CONFIRMED.");
         }
 
-        [HttpPut("orders/{id}/cancel")]
+        [HttpPut("cancel/{id}")]
+        [Authorize(Roles = "Client")]
         public async Task<ActionResult> CancelOrder(int id)
         {
-            // Zamowienie moze byc anulowane tylko przez klienta
-            // Zamowienie moze byc anulowane tylko jesli jest NEW lub CONFIRMED
-            // trzeba ustawic status na CANCELLED
-            if (!(await this.unitOfWork.Save()))
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus));
+            if (order == null)
             {
-                return BadRequest("Error has occurred when changing status to CANCELLED.");
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "NEW" || order.OrderStatus.Description != "CONFIRMED")
+            {
+                return BadRequest("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.");
             }
 
-            return NoContent();
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.ClientId != currentUser.Id)
+            {
+                return BadRequest("Order can be cancelled only by the client.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELLED");
+
+            return await SaveAndReturnActionResult("Error has occurred when changing status to CANCELLED.");
         }
 
-        [HttpPut("orders/{id}/start")]
+        [HttpPut("start/{id}")]
+        [Authorize(Roles = "Worker")]
         public async Task<ActionResult> StartOrder(int id)
         {
-            // Zamowienie moze byc wystartowane tylko przez przypisanego workera
-            // Zamowienie moze byc wystartowane tylko jesli jest CONFIRMED
-            // trzeba ustawic status na ONGOING
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "CONFIRMED")
+            {
+                return BadRequest("Only orders in status 'CONFIRMED' can be started.");
+            }
+
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.EmployeeId != currentUser.Id)
+            {
+                return BadRequest("Order can be started only by assigned employee.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "ONGOING");
+
+            return await SaveAndReturnActionResult("Error has occurred when changing status to ONGOING.");
+        }
+
+        [HttpPut("complete/{id}")]
+        [Authorize(Roles = "Worker")]
+        public async Task<ActionResult> CompleteOrder(int id)
+        {
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "ONGOING")
+            {
+                return BadRequest("Only orders in status 'ONGOING' can be started.");
+            }
+
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.EmployeeId != currentUser.Id)
+            {
+                return BadRequest("Order can be completed only by assigned employee.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "COMPLETED");
+
+            return await SaveAndReturnActionResult("Error has occurred when changing status to COMPLETED.");
+        }
+
+
+        private async Task<ActionResult> SaveAndReturnActionResult(string errorMessageOnFail)
+        {
             if (!(await this.unitOfWork.Save()))
             {
-                return BadRequest("Error has occurred when changing status to ONGOING.");
+                return BadRequest(errorMessageOnFail);
             }
 
             return NoContent();
         }
 
-        [HttpPut("orders/{id}/complete")]
-        public async Task<ActionResult> CompleteOrder(int id)
+        private float calculateTotalPrice(int area, IEnumerable<ServicePrice> services)
         {
-            // Zamowienie moze byc wystartowane tylko przez przypisanego workera
-            // Zamowienie moze byc wystartowane tylko jesli jest ONGOING
-            // trzeba ustawic status na COMPLETED
-            if (!(await this.unitOfWork.Save()))
+            float totalPrice = 0;
+            foreach (var service in services)
             {
-                return BadRequest("Error has occurred when changing status to COMPLETED.");
+                totalPrice += (area * service.PriceRatio);
             }
 
-            return NoContent();
+            return totalPrice;
         }
     }
 }

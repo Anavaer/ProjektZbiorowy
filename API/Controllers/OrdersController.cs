@@ -191,9 +191,27 @@ namespace API.Controllers
         [HttpPut("complete/{id}")]
         public async Task<ActionResult> CompleteOrder(int id)
         {
-            // Zamowienie moze byc wystartowane tylko przez przypisanego workera
-            // Zamowienie moze byc wystartowane tylko jesli jest ONGOING
-            // trzeba ustawic status na COMPLETED
+            var order = await ordersRepo.Get(filter: o => o.OrderId == id,
+                                             includes: o => o.Include(s => s.OrderStatus)
+                                                             .Include(s => s.Employee));
+            if (order == null)
+            {
+                return BadRequest("Invalid OrderId.");
+            }
+            if (order.OrderStatus.Description != "ONGOING")
+            {
+                return BadRequest("Only orders in status 'ONGOING' can be started.");
+            }
+
+            var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
+
+            if (order.EmployeeId != currentUser.Id)
+            {
+                return BadRequest("Order can be completed only by assigned employee.");
+            }
+
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "COMPLETED");
+
             return await SaveAndReturnActionResult("Error has occurred when changing status to COMPLETED.");
         }
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace API.DTO
 {
-    public class UserDto
+    public class ClientDto
     {
         public int    Id { get; set; }
         public string CompanyName { get; set; }

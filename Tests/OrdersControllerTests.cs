@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Controllers;
 using API.DataModel;
@@ -11,6 +12,7 @@ using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using NUnit.Framework;
 
@@ -75,6 +77,41 @@ namespace Tests
             Assert.AreEqual("Error has occurred when creating order.", result.Value);
         }
 
+        [Test]
+        public async Task CancelOrder_Returns_BadRequest_When_OrderStatus_Not_New_Or_Confirmed()
+        {
+            // Arrange
+            var orderMock = new Mock<Order>();
+            orderMock.SetupGet(o => o.OrderStatus).Returns(new Mock<OrderStatus>().Object);
+
+            var ordersRepo = new Mock<IGenericRepo<Order>>();
+            ordersRepo.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                        It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                      .Returns(Task.FromResult<Order>(orderMock.Object));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepo.Object);
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+
+            // Act
+            var result = await ordersController.CancelOrder(It.IsAny<int>()) as BadRequestObjectResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.AreEqual("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.", result.Value);
+        }
+
+        private ClaimsPrincipal NewClaims(int userId)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            return claimsPrincipal;
+        }
 
         private static Mock<IUnitOfWork> SetupMocksForCreateOrder()
         {

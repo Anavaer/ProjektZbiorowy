@@ -166,6 +166,95 @@ namespace Tests
             Assert.AreEqual((int)HttpStatusCode.NoContent, result.StatusCode);
         }
 
+        [Test]
+        public async Task StartOrder_Returns_BadRequest_When_OrderStatus_Not_Confirmed()
+        {
+            // Arrange
+            var orderMock = new Mock<Order>();
+            orderMock.SetupGet(o => o.OrderStatus).Returns(new Mock<OrderStatus>().Object);
+
+            var ordersRepoMock = new Mock<IGenericRepo<Order>>();
+            ordersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                            It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                          .Returns(Task.FromResult<Order>(orderMock.Object));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepoMock.Object);
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+
+            // Act
+            var result = await ordersController.StartOrder(It.IsAny<int>()) as BadRequestObjectResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.AreEqual("Only orders in status 'CONFIRMED' can be started.", result.Value);
+        }
+
+        [Test]
+        public async Task StartOrder_Returns_BadRequest_When_Current_User_Is_Not_Assigned_Employee()
+        {
+            // Arrange
+            var orderMock = new Order { OrderStatus = new OrderStatus { Description = "CONFIRMED" }, EmployeeId = 1 };
+
+            var ordersRepoMock = new Mock<IGenericRepo<Order>>();
+            ordersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                            It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                          .Returns(Task.FromResult<Order>(orderMock));
+
+            var usersRepoMock = new Mock<IGenericRepo<User>>();
+            usersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<User, bool>>>(), null))
+                         .Returns(Task.FromResult<User>(new User { Id = 2 }));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<User>()).Returns(usersRepoMock.Object);
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+
+            // Act
+            var result = await ordersController.StartOrder(It.IsAny<int>()) as BadRequestObjectResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.AreEqual("Order can be started only by assigned employee.", result.Value);
+        }
+
+        [Test]
+        public async Task StartOrder_Returns_NoContent_When_Order_Is_Started_Successfully()
+        {
+            // Arrange
+            var userMock = new User { Id = 1 };
+            var orderMock = new Order { OrderStatus = new OrderStatus { Description = "CONFIRMED" }, EmployeeId = userMock.Id };
+
+            var ordersRepoMock = new Mock<IGenericRepo<Order>>();
+            ordersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                            It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                          .Returns(Task.FromResult<Order>(orderMock));
+
+            var usersRepoMock = new Mock<IGenericRepo<User>>();
+            usersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<User, bool>>>(), null))
+                         .Returns(Task.FromResult<User>(userMock));
+
+            var statusesRepo = new Mock<IGenericRepo<OrderStatus>>();
+            statusesRepo.Setup(u => u.Get(It.IsAny<Expression<System.Func<OrderStatus, bool>>>(), null))
+                        .Returns(Task.FromResult<OrderStatus>(new Mock<OrderStatus>().Object));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<User>()).Returns(usersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<OrderStatus>()).Returns(statusesRepo.Object);
+            unitOfWorkMock.Setup(m => m.Save()).Returns(Task.FromResult<bool>(true));
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+
+            // Act
+            var result = await ordersController.StartOrder(It.IsAny<int>()) as NoContentResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.NoContent, result.StatusCode);
+        }
+
         private ClaimsPrincipal NewClaims(int userId)
         {
             var claims = new List<Claim>()

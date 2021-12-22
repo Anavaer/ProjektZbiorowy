@@ -11,6 +11,7 @@ using API.DataModel;
 using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
@@ -296,6 +297,86 @@ namespace Tests
         }
 
         [Test]
+        public async Task AssignOrder_Returns_NoContent_For_Admin_When_Order_Is_Assigned_Successfully()
+        {
+            // Arrange
+            var userRolesMock = new List<UserRole>() { new UserRole { Role = new Role { Name = "Worker" } } };
+            var userMock = new User { Id = 1, UserRoles = userRolesMock };
+            var orderMock = new Order { OrderStatus = new OrderStatus { Description = "NEW" }, ClientId = 2 };
+
+            var ordersRepoMock = new Mock<IGenericRepo<Order>>();
+            ordersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                            It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                          .Returns(Task.FromResult<Order>(orderMock));
+
+            var usersRepoMock = new Mock<IGenericRepo<User>>();
+            usersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<User, bool>>>(),
+                                           It.IsAny<Func<IQueryable<User>, IIncludableQueryable<User, object>>>()))
+                         .Returns(Task.FromResult<User>(userMock));
+
+            var statusesRepo = new Mock<IGenericRepo<OrderStatus>>();
+            statusesRepo.Setup(u => u.Get(It.IsAny<Expression<System.Func<OrderStatus, bool>>>(), null))
+                        .Returns(Task.FromResult<OrderStatus>(new Mock<OrderStatus>().Object));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<User>()).Returns(usersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<OrderStatus>()).Returns(statusesRepo.Object);
+            unitOfWorkMock.Setup(m => m.Save()).Returns(Task.FromResult<bool>(true));
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.SetupGet(x => x.User).Returns(NewClaims("Administrator"));
+            ordersController.ControllerContext.HttpContext = httpContextMock.Object;
+
+            // Act
+            var result = await ordersController.AssignOrder(It.IsAny<int>(), userMock.Id) as NoContentResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.NoContent, result.StatusCode);
+        }
+
+        [Test]
+        public async Task AssignOrder_Returns_NoContent_For_Worker_When_Order_Is_Assigned_Successfully()
+        {
+            // Arrange
+            //var userRolesMock = new List<UserRole>() { new UserRole { Role = new Role { Name = "Worker" } } };
+            var userMock = new User { Id = 1 };
+            var orderMock = new Order { OrderStatus = new OrderStatus { Description = "NEW" }, ClientId = 2 };
+
+            var ordersRepoMock = new Mock<IGenericRepo<Order>>();
+            ordersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<Order, bool>>>(),
+                                            It.IsAny<Func<IQueryable<Order>, IIncludableQueryable<Order, object>>>()))
+                          .Returns(Task.FromResult<Order>(orderMock));
+
+            var usersRepoMock = new Mock<IGenericRepo<User>>();
+            usersRepoMock.Setup(u => u.Get(It.IsAny<Expression<System.Func<User, bool>>>(),
+                                           null))
+                         .Returns(Task.FromResult<User>(userMock));
+
+            var statusesRepo = new Mock<IGenericRepo<OrderStatus>>();
+            statusesRepo.Setup(u => u.Get(It.IsAny<Expression<System.Func<OrderStatus, bool>>>(), null))
+                        .Returns(Task.FromResult<OrderStatus>(new Mock<OrderStatus>().Object));
+
+            var unitOfWorkMock = new Mock<IUnitOfWork>();
+            unitOfWorkMock.Setup(m => m.Repo<Order>()).Returns(ordersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<User>()).Returns(usersRepoMock.Object);
+            unitOfWorkMock.Setup(m => m.Repo<OrderStatus>()).Returns(statusesRepo.Object);
+            unitOfWorkMock.Setup(m => m.Save()).Returns(Task.FromResult<bool>(true));
+
+            OrdersController ordersController = new OrdersController(unitOfWorkMock.Object);
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.SetupGet(x => x.User).Returns(NewClaims("Worker"));
+            ordersController.ControllerContext.HttpContext = httpContextMock.Object;
+
+            // Act
+            var result = await ordersController.AssignOrder(It.IsAny<int>(), userMock.Id) as NoContentResult;
+
+            // Assert
+            Assert.AreEqual((int)HttpStatusCode.NoContent, result.StatusCode);
+        }
+
+        [Test]
         public async Task CompleteOrder_Returns_BadRequest_When_Current_User_Is_Not_Assigned_Employee()
         {
             // Arrange
@@ -394,11 +475,11 @@ namespace Tests
             Assert.AreEqual((int)HttpStatusCode.NoContent, result.StatusCode);
         }
 
-        private ClaimsPrincipal NewClaims(int userId)
+        private ClaimsPrincipal NewClaims(string role)
         {
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Role, role)
             };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             var claimsPrincipal = new ClaimsPrincipal(identity);

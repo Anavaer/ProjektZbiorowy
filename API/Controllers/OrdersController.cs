@@ -143,7 +143,7 @@ namespace API.Controllers
             {
                 return BadRequest("Invalid OrderId.");
             }
-            if (order.OrderStatus.Description != "NEW" || order.OrderStatus.Description != "CONFIRMED")
+            if (!(order.OrderStatus.Description == "NEW" || order.OrderStatus.Description == "CONFIRMED"))
             {
                 return BadRequest("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.");
             }

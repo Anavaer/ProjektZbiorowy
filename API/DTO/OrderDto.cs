@@ -10,7 +10,7 @@ namespace API.DTO
     {
         [Required]
         [DatesNotEmptyAndNotBeforeNow(ErrorMessage = "ServiceDates cannot be empty and all dates must be later than now.")]
-        public List<DateTime> ServiceDates { get; set; }
+        public IList<DateTime> ServiceDates { get; set; }
         [MaxLength(30)]
         [Required]
         public string City { get; set; }
@@ -21,6 +21,6 @@ namespace API.DTO
         [IntGreaterOrEqualTo(2)]
         public int Area { get; set; }
         [ListRequiredAndNotEmpty(ErrorMessage = "ServicePriceIds cannot be empty.")]
-        public List<int> ServicePriceIds { get; set; }
+        public IList<int> ServicePriceIds { get; set; }
     }
 }

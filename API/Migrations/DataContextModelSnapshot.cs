@@ -241,9 +241,6 @@ namespace API.Migrations
                     b.Property<float>("PriceRatio")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<float>("UnitPrice")
-                        .HasColumnType("decimal(10,2)");
-
                     b.HasKey("Id");
 
                     b.ToTable("ServicePrices");

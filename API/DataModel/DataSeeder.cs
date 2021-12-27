@@ -22,9 +22,14 @@ namespace API.DataModel
             {
                 var servicePrices = new List<ServicePrice>
                 {
-                    new ServicePrice { Description = "Dummy Service 01", PriceRatio = 2.0F },
-                    new ServicePrice { Description = "Dummy Service 02", PriceRatio = 1.8F },
-                    new ServicePrice { Description = "Dummy Service 03", PriceRatio = 0.75F }
+                    new ServicePrice { Description = "Window Cleaning", PriceRatio = 2.0F },
+                    new ServicePrice { Description = "Floors", PriceRatio = 1.8F },
+                    new ServicePrice { Description = "Dusting", PriceRatio = 1.2F },
+                    new ServicePrice { Description = "Washing Dishes", PriceRatio = 0.4F },
+                    new ServicePrice { Description = "Laundry", PriceRatio = 0.3F },
+                    new ServicePrice { Description = "Ironing", PriceRatio = 0.5F },
+                    new ServicePrice { Description = "Bathroom Cleaning", PriceRatio = 0.80F },
+                    new ServicePrice { Description = "Kitchen Cleaning", PriceRatio = 0.90F }
                 };
 
                 foreach (var servicePrice in servicePrices)
@@ -40,15 +45,107 @@ namespace API.DataModel
         {
             if (!(await userManager.Users.AnyAsync()))
             {
-                var client = new User { UserName = "client" };
-                await userManager.CreateAsync(client, "P@ssw0rd");
-                await userManager.AddToRoleAsync(client, "Client");
+                var clients = new List<User>
+                {
+                    new User
+                    {
+                        FirstName = "John",
+                        LastName = "Snow",
+                        City = "Winterfell",
+                        Address = "Somewhere St. 69",
+                        CompanyName = null,
+                        NIP = null,
+                        UserName = "john_snow",
+                    },
+                    new User
+                    {
+                        FirstName = "Greta",
+                        LastName = "Green",
+                        City = "Alabama",
+                        Address = "Kinder garden 123",
+                        CompanyName = null,
+                        NIP = null,
+                        UserName = "greta_green",
+                    },
+                    new User
+                    {
+                        FirstName = "Andrew",
+                        LastName = "Kloc",
+                        City = "Northshire",
+                        Address = "Route 66",
+                        CompanyName = "Build Me Up",
+                        NIP = "1122344550",
+                        UserName = "a_kloc",
+                    },
+                    new User
+                    {
+                        FirstName = "Andrew",
+                        LastName = "Golota",
+                        City = "Warsaw",
+                        Address = "Zlote Tarasy 23",
+                        CompanyName = "Punch me Sp. z o.o.",
+                        NIP = "5567788900",
+                        UserName = "a_golota",
+                    },
+                    new User
+                    {
+                        FirstName = "Client",
+                        LastName = "Lorem",
+                        City = "Rome",
+                        Address = "Bellisima 21",
+                        CompanyName = null,
+                        NIP = null,
+                        UserName = "client",
+                    },
+                };
 
-                var worker = new User { UserName = "worker" };
-                await userManager.CreateAsync(worker, "P@ssw0rd");
-                await userManager.AddToRolesAsync(worker, new[] { "Client", "Worker" });
+                foreach (var client in clients)
+                {
+                    await userManager.CreateAsync(client, "P@ssw0rd");
+                    await userManager.AddToRoleAsync(client, "Client");
+                }
 
-                var admin = new User { UserName = "admin" };
+                var workers = new List<User>
+                {
+                    new User
+                    {
+                        FirstName = "Arkadiusz",
+                        LastName = "Polaczek",
+                        City = "Warsaw",
+                        Address = "Biedna 69A",
+                        CompanyName = null,
+                        NIP = null,
+                        UserName = "areczek",
+                    },
+                    new User
+                    {
+                        FirstName = "Worker",
+                        LastName = "Ipsum",
+                        City = "Mexico City",
+                        Address = "Tacos 66",
+                        CompanyName = null,
+                        NIP = null,
+                        UserName = "worker",
+                    },
+                };
+
+                foreach (var worker in workers)
+                {
+                    await userManager.CreateAsync(worker, "P@ssw0rd");
+                    await userManager.AddToRolesAsync(worker, new[] { "Client", "Worker" });
+                }
+
+                var admin = new User
+                {
+                    FirstName = "Janusz",
+                    LastName = "Wyzyskiwacz",
+                    City = "Pcim Dolny",
+                    Address = "Sasanki 69",
+                    CompanyName = "Uslugi Sprzatajace Janusz Wyzyskiwacz",
+                    NIP = "8104022666",
+                    UserName = "admin",
+                };
+
                 await userManager.CreateAsync(admin, "P@ssw0rd");
                 await userManager.AddToRolesAsync(admin, new[] { "Client", "Worker", "Administrator" });
             }

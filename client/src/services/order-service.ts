@@ -27,7 +27,7 @@ export class OrderService {
   }
 
   public assignOrder(orderId: number, employeeId?: number): Promise<any> {
-    return axios.put([`/api/orders/assign/${orderId}`, employeeId].join("/"), {}, this.authUtils.includeAuthorization());
+    return axios.put([`/api/orders/assign/${orderId}`, employeeId && `?employeeId=${employeeId}`].join("/"), {}, this.authUtils.includeAuthorization());
   }
 
   public startOrder(orderId: number): Promise<any> {

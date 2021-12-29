@@ -1,6 +1,7 @@
 import { UserRole } from "./UserRole";
 
 export interface User {
+  id: number;
   companyName: string;
   nip: string;
   firstName: string;

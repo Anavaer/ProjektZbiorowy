@@ -12,9 +12,7 @@ export class OrderUtils {
     for(let i = 0; i < 3; i++) {
       input.servicePrices.push({id: i + 1, description: `Service price ${i + 1}`, priceRatio: 0.3})
     }
-
-    console.log(input);
-
+    
     return input;
   }
 

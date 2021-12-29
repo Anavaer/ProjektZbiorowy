@@ -9,7 +9,7 @@ import * as React from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { OrderService } from 'services/order-service';
-import { Order } from 'types';
+import { Order, User } from 'types';
 import { OrderUtils } from 'utils/order-utils';
 import { OrderEmployee } from '../order-employee/order-employee';
 import { OrderItemProps } from "./order-item-props";
@@ -41,10 +41,10 @@ export function OrderItem(props : OrderItemProps) {
 
 
 
-  const assignOrder = (): void => {
+  const assignOrder = (worker?: User): void => {
     setLoading(true);
 
-    orderService.assignOrder(order.orderId)
+    orderService.assignOrder(order.orderId, worker?.id)
       .then(() => {
         orderService.getOrder(order.orderId)
           .then(res => {
@@ -125,7 +125,7 @@ export function OrderItem(props : OrderItemProps) {
             Szczegóły
           </Button>
 
-          <OrderEmployee employee={order?.employee} onChangeAssignment={assignOrder} />
+          <OrderEmployee employee={order?.employee} client={order.client} onChangeAssignment={assignOrder} />
         </CardActions>
       </Card>
       {loading && (

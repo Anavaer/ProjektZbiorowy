@@ -3,32 +3,29 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import EventNoteIcon from '@mui/icons-material/EventNote';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 import HomeIcon from "@mui/icons-material/Home";
 import MapIcon from "@mui/icons-material/Map";
-import { Alert, Avatar, Box, Button, ButtonGroup, Card, CardContent, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Link, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { green, red } from "@mui/material/colors";
+import { Alert, Avatar, Box, Button, ButtonGroup, Card, CardContent, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Link, List, ListItem, ListItemAvatar, ListItemText, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { red } from "@mui/material/colors";
 import moment from "moment";
 import "moment/locale/pl";
 import * as React from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 import { OrderService } from "services/order-service";
-import { OrderStatusService } from "services/order-status-service";
-import { Order, OrderStatus } from "types";
+import { Order } from "types";
 import { OrderUtils } from "utils/order-utils";
 import { CustomSnackbarOptions } from '../../../utils/CustomSnackbarOptions';
 import { OrderEmployee } from '../components/order-employee/order-employee';
-import { OrderDetailsStateChangeCallbackBuilder } from './OrderDetailsChangeCallbackFactory';
+import { OrderStatusWidget } from '../components/order-status/order-status-widget';
+import { OrderStatusStateChangeCallbackBuilder } from '../components/order-status/OrderStatusChangeCallbackFactory';
 import { OrderDetailsDialogBoxOptions } from './OrderDetailsDialogBoxOptions';
-import { OrderDetailsStatusOptions } from './OrderDetailsStatusOptions';
 
 export function OrderDetails() {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const [orderFound, setOrderFound] = React.useState(true);
   const [order, setOrder] = React.useState<Order>();
-  const [orderDetailsStatusOptions, setOrderDetailsStatusOptions] = React.useState<OrderDetailsStatusOptions>({ menuOpened: false, completed: false, loading: true });
   const [customSnackbarOptions, setCustomSnackbarOptions] = React.useState<CustomSnackbarOptions>({message: "", opened: false, severity: "success"});
   const [orderDetailsDialogBoxOptions, setOrderDetailsDialogBoxOptions] = React.useState<OrderDetailsDialogBoxOptions>({ opened: false });
   
@@ -36,46 +33,43 @@ export function OrderDetails() {
   const navigate = useNavigate();
 
   const orderService: OrderService = new OrderService(cookies);
-  const orderStatusService: OrderStatusService = new OrderStatusService(cookies);
-  const orderDetailsStateChangeCallbackBuilder: OrderDetailsStateChangeCallbackBuilder = new OrderDetailsStateChangeCallbackBuilder()
-    .addMethod("CONFIRMED", orderStatus => {
-      setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: true });
+  const orderStatusStateChangeCallbackBuilder: OrderStatusStateChangeCallbackBuilder = new OrderStatusStateChangeCallbackBuilder()
+    .addMethod("CONFIRMED", data => {
+      data.setLoading(true);
       assignOrder();
-      updateOrderDetailsStatus(orderStatus);
     })
-    .addMethod("ONGOING", orderStatus => {
-      setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: true });
+    .addMethod("ONGOING", data => {
+      data.setLoading(true);
       orderService.startOrder(parseInt(params.id))
         .then(() => loadOrderDetails())
-        .then(() => setCustomSnackbarOptions({ severity: "success", opened: true, message: "Status zamówienia został zmieniony pomyślnie" }))
-        .then(() => updateOrderDetailsStatus(orderStatus));
+        .then(() => setCustomSnackbarOptions({ severity: "success", opened: true, message: "Status zamówienia został zmieniony pomyślnie" }));
     })
-    .addMethod("CANCELED", orderStatus => {
+    .addMethod("CANCELED", data => {
       setOrderDetailsDialogBoxOptions({
         opened: true,
         title: "Ostrzeżenie",
         content: "Czy na pewno chcesz anulować zamówienie?",
         approveFunction: (): void => {
-          setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: true, menuOpened: false });
+          data.setLoading(true);
           orderService.cancelOrder(parseInt(params.id))
             .then(() => setCustomSnackbarOptions({ severity: "success", opened: true, message: "Zamówienie zostało anulowane" }))
-            .then(() => updateOrderDetailsStatus(orderStatus));
-        },
-        rejectFunction: (): void => setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: false, menuOpened: false })
+            .then(() => loadOrderDetails())
+            .then(() => data.setLoading(false));
+        }
       });
     })
-    .addMethod("COMPLETED", orderStatus => {
+    .addMethod("COMPLETED", data => {
       setOrderDetailsDialogBoxOptions({
         opened: true,
         title: "Informacja",
         content: "Czy na pewno chcesz zakończyć zamówienie (nie będzie możliwe jego ponowne otworzenie)?",
         approveFunction: (): void => {
-          setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: true, menuOpened: false });
+          data.setLoading(true);
           orderService.completeOrder(parseInt(params.id))
             .then(() => setCustomSnackbarOptions({ severity: "success", opened: true, message: "Zamówienie zostało zakończone" }))
-            .then(() => updateOrderDetailsStatus(orderStatus));
-        },
-        rejectFunction: (): void => setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, loading: false, menuOpened: false })
+            .then(() => loadOrderDetails())
+            .then(() => data.setLoading(false));
+        }
       })
     });
 
@@ -98,26 +92,11 @@ export function OrderDetails() {
 
 
 
-  const openOrderStatusMenu = (evt: React.MouseEvent<HTMLElement>): void => {
-    if (!orderDetailsStatusOptions.completed)
-      setOrderDetailsStatusOptions({
-        ...orderDetailsStatusOptions,
-        menuOpened: true,
-        anchorEl: evt.currentTarget,
-        loading: false
-      });
-  }
-
-
   const closeDialogBox = (approved: boolean = false): void => {
     setOrderDetailsDialogBoxOptions({ ...orderDetailsDialogBoxOptions, opened: false });
 
-    if (approved && orderDetailsDialogBoxOptions.approveFunction != undefined) {
+    if (approved && orderDetailsDialogBoxOptions.approveFunction != undefined)
       orderDetailsDialogBoxOptions.approveFunction();
-    }
-    else if (orderDetailsDialogBoxOptions.rejectFunction != undefined) {
-      orderDetailsDialogBoxOptions.rejectFunction();
-    }
   }
 
   
@@ -132,41 +111,8 @@ export function OrderDetails() {
 
   const loadOrderDetails = (): void => {
     orderService.getOrder(parseInt(params.id))
-      .then(res => {
-        setOrder(res);
-
-        let newOrderDetailsStatusOptions: OrderDetailsStatusOptions = {
-          ...orderDetailsStatusOptions,
-          loading: false,
-          completed: OrderUtils.isCompleted(res),
-          menuOpened: false,
-          colors: OrderUtils.getOrderStatusColor(res.orderStatus.description)
-        };
-
-        setOrderDetailsStatusOptions(newOrderDetailsStatusOptions);
-        return newOrderDetailsStatusOptions;
-      })
-      .then(options => {
-        orderStatusService.getAllOrderStatuses()
-          .then(res => setOrderDetailsStatusOptions({ ...options, list: res, loading: false }));
-      })
+      .then(res => setOrder(res))
       .catch(() => setOrderFound(false));
-  }
-
-  const updateOrderDetailsStatus = (orderStatus: OrderStatus): void => {
-    let newOrder: Order = Object.assign({}, order);
-    newOrder.orderStatus.orderStatusId = orderStatus.orderStatusId;
-    newOrder.orderStatus.description = orderStatus.description;
-    setOrder(newOrder);
-
-    setOrderDetailsStatusOptions({
-      ...orderDetailsStatusOptions,
-      anchorEl: undefined,
-      list: [...(orderDetailsStatusOptions.list ?? [])].filter(x => x.orderStatusId >= orderStatus.orderStatusId),
-      colors: OrderUtils.getOrderStatusColor(orderStatus.description),
-      menuOpened: false,
-      completed: OrderUtils.isCompleted(order)
-    });
   }
 
 
@@ -191,7 +137,11 @@ export function OrderDetails() {
                 padding: '16px'
               }}>
                 <Typography component="h5" variant="h5">Szczegóły zamówienia</Typography>
-                <OrderEmployee employee={order?.employee} onChangeAssignment={assignOrder} />
+                <OrderEmployee 
+                  employee={order?.employee} 
+                  client={order?.client} 
+                  onChangeAssignment={assignOrder} 
+                />
               </Box>
             </Card>
           </Grid>
@@ -227,71 +177,11 @@ export function OrderDetails() {
                   </ListItem>
                 </List>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography component="p" variant="subtitle1">Status zamówienia</Typography>
-                <Box sx={{ m: 1, position: 'relative' }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    endIcon={<ExpandMoreIcon />}
-                    onClick={openOrderStatusMenu}
-                    disableRipple={orderDetailsStatusOptions.completed}
-                    disabled={orderDetailsStatusOptions.loading}
-                    sx={{
-                      ...orderDetailsStatusOptions.colors,
-                      fontWeight: 'bold',
-                      ':hover': {
-                        'bgcolor': !orderDetailsStatusOptions.completed ? orderDetailsStatusOptions.colors?.backgroundDark : orderDetailsStatusOptions.colors?.background
-                      }
-                    }}
-                  >
-                    {order?.orderStatus.description}
-                  </Button>
-                  {orderDetailsStatusOptions.loading && (
-                    <CircularProgress
-                      size={24}
-                      sx={{
-                        color: green[500],
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        marginTop: '-12px',
-                        marginLeft: '-12px',
-                      }}
-                    />
-                  )}
-                </Box>
-              </Box>
-              <Menu
-                id="order-status-menu"
-                MenuListProps={{ 'aria-labelledby': "order-status-menu" }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                anchorEl={orderDetailsStatusOptions.anchorEl}
-                open={orderDetailsStatusOptions.menuOpened}
-                onClose={() => setOrderDetailsStatusOptions({ ...orderDetailsStatusOptions, menuOpened: false, loading: false }) }
-                sx={{
-                  'ul': {
-                    padding: '0'
-                  }
-                }}
-              >
-                {orderDetailsStatusOptions.list?.filter(x => x.description == "CANCELED" || x.orderStatusId == (order?.orderStatus.orderStatusId ?? 1) + 1)
-                .map(status => {
-                  let colors = OrderUtils.getOrderStatusColor(status.description);
-                  return (
-                    <MenuItem
-                      sx={{
-                        ...colors,
-                        fontWeight: 'bold',
-                        ':hover': {
-                          'bgcolor': colors?.backgroundDark
-                        }
-                      }}
-                      onClick={() => orderDetailsStateChangeCallbackBuilder.run(status)}>{status.description}</MenuItem>
-                  )
-                })}
-              </Menu>
+              <OrderStatusWidget 
+                value={order?.orderStatus}
+                completed={OrderUtils.isCompleted(order)}
+                callbackBuilder={orderStatusStateChangeCallbackBuilder} 
+              />
             </Card>
           </Grid>
           <Grid item xs={8}>

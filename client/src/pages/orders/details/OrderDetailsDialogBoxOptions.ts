@@ -3,5 +3,4 @@ export interface OrderDetailsDialogBoxOptions {
   title?: string;
   content?: string;
   approveFunction?: () => void;
-  rejectFunction?: () => void;
 }

@@ -1,10 +1,8 @@
 import EventNoteIcon from '@mui/icons-material/EventNote';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import MapIcon from '@mui/icons-material/Map';
 import PersonIcon from '@mui/icons-material/Person';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import { Avatar, Box, Button, Card, CardActions, CardContent, CircularProgress, Grid, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardActions, CardContent, CircularProgress, Grid, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from "@mui/material";
 import { green, red } from "@mui/material/colors";
 import moment from "moment";
 import * as React from 'react';
@@ -18,14 +16,12 @@ import { OrderItemProps } from "./order-item-props";
 
 export function OrderItem(props : OrderItemProps) {
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [orderStateColors, setOrderStateColors] = React.useState<any>();
   const [loading, setLoading] = React.useState(false);
   const [cookies, setCookies, removeCookies] = useCookies(["token"]);
   const [order, setOrder] = React.useState<Order>(props.order);
 
   const navigate = useNavigate();
-  const optionsOpened: boolean = Boolean(anchorEl);
 
   const orderService: OrderService = new OrderService(cookies);
 
@@ -44,22 +40,23 @@ export function OrderItem(props : OrderItemProps) {
   
 
 
-  const handleOpenMoreOptionsClick = (event: React.MouseEvent<HTMLElement>): void => setAnchorEl(event.currentTarget);
-  const handleCloseMoreOptionsClick = (): void => setAnchorEl(null);
 
   const assignOrder = (): void => {
-    setAnchorEl(null);
     setLoading(true);
 
     orderService.assignOrder(order.orderId)
       .then(() => {
-        orderService.getOrder(order.orderId).then(res => setOrder(res));
+        orderService.getOrder(order.orderId)
+          .then(res => {
+            setOrder(res);
+            let colors = OrderUtils.getOrderStatusColor(res.orderStatus.description);
+            setOrderStateColors({ ...orderStateColors, ...colors });
+          });
         props.onChangeAssignment(true);
       })
       .catch(err => props.onChangeAssignment(false, err.response.data))
       .finally(() => setLoading(false));
   }
-  const openOrderDetailsPage = (): void => navigate(`/orders/${order.orderId}`);
   
 
 
@@ -123,32 +120,12 @@ export function OrderItem(props : OrderItemProps) {
             disableElevation
             aria-controls={"order-menu-" + order.orderId}
             aria-haspopup="true"
-            endIcon={<ExpandMoreIcon />}
-            onClick={handleOpenMoreOptionsClick}>
-            Opcje
+            startIcon={<InfoIcon />}
+            onClick={() => navigate(`/orders/${order.orderId}`)}>
+            Szczegóły
           </Button>
-          <Menu
-            id={"order-menu-" + order.orderId}
-            MenuListProps={{ 'aria-labelledby': "order-menu-" + order.orderId }}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            anchorEl={anchorEl}
-            open={optionsOpened}
-            onClose={handleCloseMoreOptionsClick}
-          >
-            {order.employee == null ? (
-              <MenuItem onClick={assignOrder} disableRipple>
-                <PersonAddAltIcon sx={{ marginRight: '10px' }} />
-                Przypisz do mnie
-              </MenuItem>
-            ) : null}
-            <MenuItem onClick={openOrderDetailsPage} disableRipple>
-              <InfoIcon sx={{ marginRight: '10px' }} />
-              Wyświetl szczegóły
-            </MenuItem>
-          </Menu>
 
-          <OrderEmployee employee={order?.employee} />
+          <OrderEmployee employee={order?.employee} onChangeAssignment={assignOrder} />
         </CardActions>
       </Card>
       {loading && (

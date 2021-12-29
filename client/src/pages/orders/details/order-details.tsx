@@ -31,7 +31,6 @@ export function OrderDetails() {
   const [orderDetailsStatusOptions, setOrderDetailsStatusOptions] = React.useState<OrderDetailsStatusOptions>({ menuOpened: false, completed: false, loading: true });
   const [customSnackbarOptions, setCustomSnackbarOptions] = React.useState<CustomSnackbarOptions>({message: "", opened: false, severity: "success"});
   const [orderDetailsDialogBoxOptions, setOrderDetailsDialogBoxOptions] = React.useState<OrderDetailsDialogBoxOptions>({ opened: false });
-  const [assignOrderLoading, setAssignOrderLoading] = React.useState(false);
   
   const params: any = useParams();
   const navigate = useNavigate();
@@ -123,14 +122,10 @@ export function OrderDetails() {
 
   
   const assignOrder = (): void => {
-    setAssignOrderLoading(true);
     orderService.assignOrder(parseInt(params.id))
       .then(() => loadOrderDetails())
       .then(() => setCustomSnackbarOptions({ severity: "success", opened: true, message: "Zamówienie zostało przypisane pomyślnie" }))
-      .catch(err => {
-        setCustomSnackbarOptions({ severity: "error", opened: true, message: err.response.data });
-        setAssignOrderLoading(false);
-      });
+      .catch(err => setCustomSnackbarOptions({ severity: "error", opened: true, message: err.response.data }));
   }
 
 
@@ -196,27 +191,7 @@ export function OrderDetails() {
                 padding: '16px'
               }}>
                 <Typography component="h5" variant="h5">Szczegóły zamówienia</Typography>
-                <Box sx={{ display: 'flex' }}>
-                  {order?.orderStatus.description == "NEW" && (
-                    <Box sx={{ m: 1, position: 'relative' }}>
-                      <Button onClick={assignOrder} disabled={assignOrderLoading}>Przypisz do mnie</Button>
-                      {assignOrderLoading && (
-                        <CircularProgress
-                          size={24}
-                          sx={{
-                            color: green[500],
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            marginTop: '-12px',
-                            marginLeft: '-12px',
-                          }}
-                        />
-                      )}
-                    </Box>
-                  )}
-                  <OrderEmployee employee={order?.employee} />
-                </Box>
+                <OrderEmployee employee={order?.employee} onChangeAssignment={assignOrder} />
               </Box>
             </Card>
           </Grid>

@@ -1,5 +1,3 @@
-import { UserRole } from "./UserRole";
-
 export interface User {
   id: number;
   companyName: string;
@@ -8,6 +6,7 @@ export interface User {
   lastName: string;
   city: string;
   address: string;
-  userRoles: UserRole[];
+  phoneNumber?: string;
+  roles?: string[];
   email: string;
 }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "types";
+import { ServicePrice, User } from "types";
 import { AuthUtils } from "utils/auth-utils";
 
 export class AdminService {
@@ -12,6 +12,11 @@ export class AdminService {
 
   public getUsers(): Promise<User[]> {
     return axios.get("/api/admin/users", this.authUtils.includeAuthorization())
+      .then(res => res.data);
+  }
+
+  public getServices(): Promise<ServicePrice[]> {
+    return axios.get("/api/admin/services", this.authUtils.includeAuthorization())
       .then(res => res.data);
   }
 }

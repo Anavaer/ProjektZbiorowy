@@ -1,24 +1,24 @@
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import DoneIcon from '@mui/icons-material/Done';
-import DeleteIcon from '@mui/icons-material/Delete';
-import DateRangeIcon from '@mui/icons-material/DateRange';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import CloseIcon from '@mui/icons-material/Close';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DoneIcon from '@mui/icons-material/Done';
 import { DateTimePicker, LocalizationProvider } from '@mui/lab';
 import DateAdapter from '@mui/lab/AdapterMoment';
-import { Alert, Avatar, Box, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, Input, InputLabel, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Snackbar, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Avatar, Box, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, List, ListItemAvatar, ListItemButton, ListItemText, Snackbar, TextField, Tooltip, Typography } from '@mui/material';
+import { blue, red } from '@mui/material/colors';
 import moment from 'moment';
 import 'moment/locale/pl';
 import * as React from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
+import { AdminService } from 'services/admin-service';
 import { OrderService } from 'services/order-service';
-import { ServicePriceService } from 'services/service-price-service';
 import { Order, ServicePrice } from 'types';
 import { OrderDTO } from 'types/order/OrderDTO';
 import { CustomSnackbarOptions } from '../../../utils/CustomSnackbarOptions';
 import { OrderItem } from '../components/order-item/order-item';
-import { blue, red } from '@mui/material/colors';
 
 
 
@@ -42,8 +42,7 @@ export function OrderList() {
   );
 
   const orderService: OrderService = new OrderService(cookies);
-  const servicePriceService: ServicePriceService = new ServicePriceService(cookies);
-
+  const adminService: AdminService = new AdminService(cookies);
 
 
 
@@ -69,7 +68,7 @@ export function OrderList() {
     setAddServiceDateDisabled(false);
     
     if (servicePrices.length == 0) {
-      servicePriceService.getServicePriceList()
+      adminService.getServices()
         .then(res => setServicePrices(res));
     }
   }
@@ -176,7 +175,6 @@ export function OrderList() {
         </Grid>
       </Container>
 
-    {/* TODO: To finish order creating */}
       <Dialog
         maxWidth="lg"
         fullWidth={true}
@@ -313,7 +311,6 @@ export function OrderList() {
                   }
                 />
                 <CardContent>
-                  {/* TODO: return the list of services */}
                   <List>
                     {servicePrices.map(servicePrice => (
                       <ListItemButton 

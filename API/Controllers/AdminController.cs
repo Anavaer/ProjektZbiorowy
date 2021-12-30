@@ -4,13 +4,13 @@ using API.DataModel;
 using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    // TODO: Add Authorize attributes according to Roles
     [ApiController]
     [Route("api/[controller]")]
     public class AdminController : ControllerBase
@@ -26,6 +26,7 @@ namespace API.Controllers
             this.servicesRepo = this.unitOfWork.Repo<ServicePrice>();
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet("users")]
         public async Task<ActionResult> GetUsers()
         {
@@ -43,6 +44,7 @@ namespace API.Controllers
                                                   .ToListAsync());
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet("users/{id}")]
         public async Task<ActionResult> GetUser(int id)
         {
@@ -63,7 +65,7 @@ namespace API.Controllers
                                                   .SingleAsync());
         }
 
-
+        [Authorize(Roles = "Administrator")]
         [HttpPut("edit-role/{id}")]
         public async Task<ActionResult> EditRole(int id, [FromQuery] string roles)
         {
@@ -96,6 +98,7 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpGet("services")]
         public async Task<ActionResult> GetServices()
         {
@@ -107,6 +110,7 @@ namespace API.Controllers
             }).ToList());
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost("add-service")]
         public async Task<ActionResult> AddService(ServiceAddAndEditDto serviceDto)
         {
@@ -126,6 +130,7 @@ namespace API.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPut("edit-service/{id}")]
         public async Task<ActionResult> EditService(int id, ServiceAddAndEditDto serviceDto)
         {

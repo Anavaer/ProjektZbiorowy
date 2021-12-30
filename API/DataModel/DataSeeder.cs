@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using API.DataModel.Entities;
 using API.DataModel.Entities.AspNetIdentity;
@@ -14,6 +16,12 @@ namespace API.DataModel
             await SeedRoles(roleManager);
             await SeedUsers(userManager);
             await SeedServicePrices(dataContext);
+            for (int i = 0; i < 20; i++)
+            {
+                await dataContext.Orders.AddAsync(await NewOrder(dataContext, userManager));
+            }
+
+            await dataContext.SaveChangesAsync();
         }
 
         private static async Task SeedServicePrices(DataContext dataContext)
@@ -167,6 +175,56 @@ namespace API.DataModel
                     await roleManager.CreateAsync(role);
                 }
             }
+        }
+
+        private static async Task<Order> NewOrder(DataContext dataContext, UserManager<User> userManager)
+        {
+            var order = new Order();
+            order.City = RandomString(25);
+            order.Address = RandomString(40);
+            order.Area = new Random().Next(4, 80);
+            order.ServiceDate = RandomDatetime();
+
+            var status = await dataContext.OrderStatuses.SingleAsync(s => s.Description == "NEW");
+            order.OrderStatus = status;
+            order.OrderStatusId = status.OrderStatusId;
+
+            var clients = await userManager.GetUsersInRoleAsync("Client");
+            var client = clients[new Random().Next(0, clients.Count - 1)];
+
+            order.Client = client;
+            order.ClientId = client.Id;
+
+            order.ServicePrices = await dataContext.ServicePrices.ToListAsync();
+            order.TotalPrice = CalculateTotalPrice(order.Area, order.ServicePrices);
+
+            return order;
+        }
+
+        private static string RandomString(int length)
+        {
+            Random random = new Random();
+
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        private static DateTime RandomDatetime()
+        {
+            DateTime start = DateTime.Now;
+            return start.AddDays(new Random().Next(1, 300));
+        }
+
+        private static float CalculateTotalPrice(int area, IEnumerable<ServicePrice> services)
+        {
+            float totalPrice = 0;
+            foreach (var service in services)
+            {
+                totalPrice += (area * service.PriceRatio);
+            }
+
+            return totalPrice;
         }
     }
 }

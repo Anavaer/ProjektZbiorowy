@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Order } from "types";
+import { Order, OrderDTO } from "types";
 import { AuthUtils } from "utils/auth-utils";
 import { OrderUtils } from "utils/order-utils";
 
@@ -40,5 +40,9 @@ export class OrderService {
 
   public completeOrder(orderId: number): Promise<any> {
     return axios.put(`/api/orders/complete/${orderId}`, {}, this.authUtils.includeAuthorization());
+  }
+
+  public createOrder(orderDTO: OrderDTO): Promise<any> {
+    return axios.post("/api/orders/create", orderDTO, this.authUtils.includeAuthorization());
   }
 }

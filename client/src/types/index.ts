@@ -1,4 +1,5 @@
 export type { Order } from "./order/Order";
+export type { OrderDTO } from "./order/OrderDTO";
 export type { OrderStatus } from "./order/OrderStatus";
 export type { ServicePrice } from "./ServicePrice";
 export type { Role } from "./user/Role";

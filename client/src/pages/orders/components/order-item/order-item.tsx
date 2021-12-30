@@ -79,7 +79,7 @@ export function OrderItem(props : OrderItemProps) {
                 color: red[500],
                 fontWeight: 'bold'
               }}>
-              {order.totalPrice}zł
+              {order.totalPrice.toFixed(2)}zł
             </Typography>
           </Box>
           <Box>

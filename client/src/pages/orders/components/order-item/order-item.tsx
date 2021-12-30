@@ -8,7 +8,7 @@ import moment from "moment";
 import * as React from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { OrderService } from 'services/order-service';
+import { OrderService } from 'services/order/order-service';
 import { Order, User } from 'types';
 import { OrderUtils } from 'utils/order-utils';
 import { OrderEmployee } from '../order-employee/order-employee';

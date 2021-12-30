@@ -13,7 +13,7 @@ import "moment/locale/pl";
 import * as React from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate, useParams } from "react-router-dom";
-import { OrderService } from "services/order-service";
+import { OrderService } from "services/order/order-service";
 import { Order } from "types";
 import { OrderUtils } from "utils/order-utils";
 import { CustomSnackbarOptions } from '../../../utils/CustomSnackbarOptions';

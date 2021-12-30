@@ -4,7 +4,7 @@ import { grey, red } from "@mui/material/colors";
 import { OrderEmployeeProps } from "./order-employee-props";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import { useCookies } from 'react-cookie';
-import { AdminService } from 'services/admin-service';
+import { AdminService } from 'services/admin/admin-service';
 import { User } from 'types';
 
 export function OrderEmployee(props: OrderEmployeeProps) {

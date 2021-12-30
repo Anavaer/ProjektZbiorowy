@@ -3,7 +3,7 @@ import { Box, Button, CircularProgress, Menu, MenuItem, Typography } from "@mui/
 import { green } from "@mui/material/colors";
 import * as React from 'react';
 import { useCookies } from 'react-cookie';
-import { OrderStatusService } from 'services/order-status-service';
+import { OrderStatusService } from 'services/order/status/order-status-service';
 import { OrderStatus } from "types";
 import { OrderUtils } from "utils/order-utils";
 import { OrderStatusWidgetColorsOptions } from "./order-status-widget-colors-props";

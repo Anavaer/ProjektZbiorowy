@@ -8,6 +8,11 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useCookies } from 'react-cookie';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const theme = createTheme();
 
@@ -33,11 +38,12 @@ function App() {
           </Typography>
           {
             isLoggedIn ? ([
-              <Button color='inherit'><Link to='orders'>Zamówienia</Link></Button>,
-              <Button color='inherit' onClick={logOut}>Wyloguj</Button>
+              <Button color='inherit' startIcon={<ShoppingCartIcon />}><Link to='orders'>Zamówienia</Link></Button>,
+              <Button color='inherit' startIcon={<AccountCircleIcon />}>{cookies.username}</Button>,
+              <Button color='inherit' startIcon={<LogoutIcon />} onClick={logOut}>Wyloguj</Button>
             ]) : ([
-              <Button color='inherit'><Link to='sign-in'>Zaloguj</Link></Button>,
-              <Button color='inherit'><Link to='sign-up'>Zarejestruj</Link></Button>
+              <Button color='inherit' startIcon={<LoginIcon />}><Link to='sign-in'>Zaloguj</Link></Button>,
+              <Button color='inherit' startIcon={<PersonAddAltIcon />}><Link to='sign-up'>Zarejestruj</Link></Button>
             ])
           }
 

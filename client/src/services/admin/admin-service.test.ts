@@ -1,6 +1,7 @@
 import { AdminService } from "./admin-service";
 import axios from "axios";
 import { ServicePrice, User } from "types";
+import { mockServicePriceList, mockUserList } from "__mocks__/admin";
 
 jest.mock("axios");
 
@@ -10,15 +11,21 @@ let adminService: AdminService = new AdminService({ token: "test-token" });
 
 
 describe("AdminServiceTest", () => {
+
+  beforeEach(() => {
+    mockAxios.get.mockImplementation(url => {
+      switch(url) {
+        case "/api/admin/users":
+          return Promise.resolve({ data: mockUserList });
+        case "/api/admin/services":
+          return Promise.resolve({ data: mockServicePriceList });
+        default:
+          return Promise.reject(new Error("Unexpected"));
+      }
+    })
+  });
+
   test("getUsers", async () => {
-
-    mockAxios.get.mockResolvedValueOnce({
-      data: [
-        { "id": 1, "firstName": "Client", "lastName": "Clientowski", "companyName": "Moja firma", "roles": ["Client"] },
-        { "id": 2, "firstName": "Worker", "lastName": "Workerowski", "companyName": "Moja firma", "roles": ["Client", "Worker"] }
-      ]
-    });
-
     let res: User[] = await adminService.getUsers();
 
     expect(res.length).toEqual(2);
@@ -36,15 +43,6 @@ describe("AdminServiceTest", () => {
 
 
   test("getServices", async () => {
-
-    mockAxios.get.mockResolvedValueOnce({
-      data: [
-        { "id": 1, "description": "Dummy Service 03", "priceRatio": 0.75 },
-        { "id": 2, "description": "Dummy Service 02", "priceRatio": 1.8 },
-        { "id": 3, "description": "Dummy Service 01", "priceRatio": 2 }
-      ]
-    });
-
     let res: ServicePrice[] = await adminService.getServices();
 
     expect(res.length).toEqual(3);

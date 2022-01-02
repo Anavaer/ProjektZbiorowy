@@ -3,8 +3,8 @@ import { AxiosRequestConfig } from "axios";
 export class AuthUtils {
   private token: string;
 
-  constructor(token: string) {
-    this.token = token;
+  constructor(cookies: any) {
+    this.token = cookies.token;
   }
 
   public includeAuthorization(): AxiosRequestConfig<any> {

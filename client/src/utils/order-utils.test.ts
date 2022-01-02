@@ -39,7 +39,7 @@ describe('OrderUtils testing', () => {
   test("processOrderTest", () => {
     expect(parsedOrder.serviceDate).toEqual(new Date(input.serviceDate));
     expect(parsedOrder.totalPrice).toEqual(Math.floor(input.totalPrice * 100) / 100);
-    expect(parsedOrder.servicePrices.length).toBeGreaterThan(0);
+    expect(parsedOrder.services.length).toBeGreaterThan(0);
   });
 
 

@@ -12,5 +12,5 @@ export interface Order {
   area: number;
   employee?: User;
   totalPrice: number;
-  servicePrices: ServicePrice[];
+  services: ServicePrice[];
 }

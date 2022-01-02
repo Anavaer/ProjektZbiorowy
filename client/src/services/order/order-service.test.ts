@@ -26,8 +26,8 @@ const testOrder = (order: Order): void => {
     expect(order.employee).not.toBeNull();
 
   expect(order.client).not.toBeNull();
-  expect(order.servicePrices).not.toBeNull();
-  expect(order.servicePrices.length).toBeGreaterThan(0);
+  expect(order.services).not.toBeNull();
+  expect(order.services.length).toBeGreaterThan(0);
 }
 
 

@@ -203,7 +203,7 @@ export function OrderDetails() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {order?.servicePrices.map(servicePrice => (
+                      {order?.services.map(servicePrice => (
                         <TableRow key={"order-details-service-price" + servicePrice.id} role="order-details-service-price">
                           <TableCell>{servicePrice.id}</TableCell>
                           <TableCell>{servicePrice.description}</TableCell>
@@ -246,50 +246,58 @@ export function OrderDetails() {
                       primary={order?.client.city + ", " + order?.client.address}
                       secondary="Adres zamieszkania"/>
                   </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <ApartmentIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      role="order-details-client-company-name"
-                      primary={order?.client.companyName}
-                      secondary="Nazwa firmy" />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <AlternateEmailIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      role="order-details-client-email"
-                      primary={order?.client.email}
-                      secondary="Adres e-mail" />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <PhoneIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      role="order-details-client-phone"
-                      primary={order?.client.phoneNumber}
-                      secondary="Numer telefonu" />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <Grid3x3Icon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      role="order-details-client-nip"
-                      primary={order?.client.nip}
-                      secondary="NIP" />
-                  </ListItem>
+                  {order?.client.companyName && (
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <ApartmentIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        role="order-details-client-company-name"
+                        primary={order?.client.companyName}
+                        secondary="Nazwa firmy" />
+                    </ListItem>
+                  )}
+                  {order?.client.email && (
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <AlternateEmailIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        role="order-details-client-email"
+                        primary={order?.client.email}
+                        secondary="Adres e-mail" />
+                    </ListItem>
+                  )}
+                  {order?.client.phoneNumber && (
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <PhoneIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        role="order-details-client-phone"
+                        primary={order?.client.phoneNumber}
+                        secondary="Numer telefonu" />
+                    </ListItem>
+                  )}
+                  {order?.client.nip && (
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <Grid3x3Icon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        role="order-details-client-nip"
+                        primary={order?.client.nip}
+                        secondary="NIP" />
+                    </ListItem>
+                  )}
                 </List>
               </CardContent>
             </Card>

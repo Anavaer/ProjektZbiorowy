@@ -8,7 +8,7 @@ export class OrderService {
   private authUtils: AuthUtils;
 
   constructor(cookies: any) {
-    this.authUtils = new AuthUtils(cookies.token);
+    this.authUtils = new AuthUtils(cookies);
   }
 
   public getOrders(): Promise<Order[]> {

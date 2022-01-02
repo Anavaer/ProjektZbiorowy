@@ -89,12 +89,12 @@ describe("OrderDetailsTest", () => {
     expect(orderDetailsArea).toHaveTextContent("Powierzchnia apartamentu");
     expect(orderStatusWidget).toBeInTheDocument();
     expect(orderStatusWidget).toHaveTextContent(mockOrderItem.orderStatus.description);
-    expect(orderDetailsServicePrices.length).toBe(mockOrderItem.servicePrices.length);
+    expect(orderDetailsServicePrices.length).toBe(mockOrderItem.services.length);
 
-    for (let i = 0; i < mockOrderItem.servicePrices.length; i++) {
-      expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.servicePrices[i].id + "");
-      expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.servicePrices[i].description);
-      expect(orderDetailsServicePrices[i]).toHaveTextContent((mockOrderItem.servicePrices[i].priceRatio * mockOrderItem?.totalPrice).toFixed(2) + "zł");
+    for (let i = 0; i < mockOrderItem.services.length; i++) {
+      expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.services[i].id + "");
+      expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.services[i].description);
+      expect(orderDetailsServicePrices[i]).toHaveTextContent((mockOrderItem.services[i].priceRatio * mockOrderItem?.totalPrice).toFixed(2) + "zł");
     }
 
     expect(orderDetailsTotalPrice).toHaveTextContent(mockOrderItem.totalPrice.toFixed(2) + "zł");

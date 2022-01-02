@@ -70,9 +70,15 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
             sx={{
               ...statusColors,
               fontWeight: 'bold',
+              cursor: !props.completed ? 'pointer' : 'default',
               ':hover': {
-                'bgcolor': !props.completed ? statusColors?.backgroundDark : statusColors?.background
-              }
+                'bgcolor': !props.completed ? statusColors?.backgroundDark : statusColors?.background,
+                boxShadow: !props.completed ? 'button.shadow' : 'none'
+              },
+              ':active': {
+                boxShadow: !props.completed ? 'button.shadow' : 'none'
+              },
+              boxShadow: !props.completed ? 'button.shadow' : 'none'
             }}
           >
             {props.value?.description}

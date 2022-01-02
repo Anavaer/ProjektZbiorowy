@@ -18,10 +18,10 @@ export class OrderUtils {
   }
 
 
-  public static getOrderStatusColor(orderStatus: string): OrderStatusWidgetColorsOptions {
+  public static getOrderStatusColor(orderStatusDescription: string): OrderStatusWidgetColorsOptions {
     let res: OrderStatusWidgetColorsOptions;
 
-    switch(orderStatus) {
+    switch(orderStatusDescription) {
       case "NEW":         res = { background: grey[500], backgroundDark: grey[700], color: "white" }; break;
       case "CONFIRMED":   res = { background: yellow[500], backgroundDark: yellow[700], color: "black" }; break;
       case "ONGOING":     res = { background: blue[500], backgroundDark: blue[700], color: "white" }; break;

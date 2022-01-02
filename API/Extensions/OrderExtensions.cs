@@ -40,7 +40,8 @@ namespace API.Extensions
                     Services = order.ServicePrices.Select(x => new ServicePriceDto
                     {
                         Id = x.Id,
-                        Description = x.Description
+                        Description = x.Description,
+                        PriceRatio = x.PriceRatio
                     })
                 };
             }

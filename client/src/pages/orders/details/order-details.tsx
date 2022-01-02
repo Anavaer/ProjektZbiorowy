@@ -199,7 +199,7 @@ export function OrderDetails() {
                       <TableRow>
                         <TableCell sx={{ fontWeight: 'bold' }} >Numer usługi</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} >Nazwa usługi</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}  align="right">Cena zausługę</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}  align="right">Cena za usługę</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>

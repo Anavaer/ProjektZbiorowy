@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 import { Home, SignIn, SignUp, OrderList, OrderDetails } from 'pages';
 import AppBar from '@mui/material/AppBar';
@@ -15,9 +15,13 @@ function App() {
   const [cookies, setCookie, removeCookie] = useCookies(['username', 'token']);
   const isLoggedIn = cookies.username && cookies.token;
 
+  const navigate = useNavigate();
+
   const logOut = () => {
     removeCookie('username');
     removeCookie('token');
+    removeCookie('role');
+    navigate('/');
   }
 
   return (

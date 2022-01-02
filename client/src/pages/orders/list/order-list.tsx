@@ -236,8 +236,10 @@ export function OrderList() {
                             id='area'
                             label='Powierzchnia'
                             name='area'
-                            
-                            onChange={evt => setCreatedOrder({ ...createdOrder, area: parseInt(evt.currentTarget.value) })}
+                            type="number"
+                            onChange={evt => {
+                              setCreatedOrder({ ...createdOrder, area: evt.currentTarget.value ? parseInt(evt.currentTarget.value) : 0 });
+                            }}
                           />
                         </Grid>
                       </Grid>
@@ -339,7 +341,8 @@ export function OrderList() {
                         role="order-list-service-price"
                         key={"order-list-service-price-" + servicePrice.id}
                         onClick={() => selectService(servicePrice)}
-                        selected={createdOrder.servicePriceIds.includes(servicePrice.id)}>
+                        selected={createdOrder.servicePriceIds.includes(servicePrice.id)}
+                      >
                         <ListItemAvatar>
                           <Avatar>
                             {servicePrice.id}
@@ -347,7 +350,7 @@ export function OrderList() {
                         </ListItemAvatar>
                         <ListItemText 
                           primary={servicePrice.description} 
-                          secondary={"Price ratio: " + servicePrice.priceRatio.toFixed(2)}
+                          secondary={"Cena: " + (createdOrder.area * servicePrice.priceRatio).toFixed(2) + "zł"}
                         />
                       </ListItemButton>
                     ))}

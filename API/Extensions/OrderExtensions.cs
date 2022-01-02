@@ -9,7 +9,7 @@ namespace API.Extensions
 {
     public static class OrderExtensions
     {
-        public static IEnumerable<OrderDescriptionDto>ToOrderDescriptionsDto(this IEnumerable<Order> orders)
+        public static IEnumerable<OrderDescriptionDto> ToOrderDescriptionsDto(this IEnumerable<Order> orders)
         {
             if (orders.Any())
             {
@@ -36,7 +36,12 @@ namespace API.Extensions
                     TotalPrice = order.TotalPrice,
                     OrderStatus = order.OrderStatus,
                     Employee = order.Employee.ToEmployeeDto(),
-                    Client = order.Client.ToClientDto()
+                    Client = order.Client.ToClientDto(),
+                    Services = order.ServicePrices.Select(x => new ServicePriceDto
+                    {
+                        Id = x.Id,
+                        Description = x.Description
+                    })
                 };
             }
             else

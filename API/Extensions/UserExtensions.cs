@@ -1,6 +1,5 @@
 using API.DataModel.Entities.AspNetIdentity;
 using API.DTO;
-using System.Security.Claims;
 
 namespace API.Extensions
 {

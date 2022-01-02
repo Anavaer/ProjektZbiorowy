@@ -1,6 +1,6 @@
 import {AuthUtils} from "./auth-utils";
 
-const authUtils: AuthUtils = new AuthUtils("test-token");
+const authUtils: AuthUtils = new AuthUtils({ token: "test-token" });
 
 describe("AuthUtilsTest", () => {
   test("includeAuthorizationTest", () => {

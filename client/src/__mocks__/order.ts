@@ -23,7 +23,24 @@ export const mockOrderList: Order[] = [
       "address": "ul. Sienkiewicza 3",
       "phoneNumber": "111222333",
       "email": "cclientowski@gmail.com"
-    }
+    },
+    "services": [
+      {
+        "id": 1,
+        "description": "Dusting",
+        "priceRatio": 1.2
+      },
+      {
+        "id": 2,
+        "description": "Floors",
+        "priceRatio": 1.8
+      },
+      {
+        "id": 3,
+        "description": "Window Cleaning",
+        "priceRatio": 2
+      }
+    ]
   },
   {
     "orderId": 1,
@@ -53,7 +70,24 @@ export const mockOrderList: Order[] = [
       "address": "ul. Sienkiewicza 3",
       "phoneNumber": "111222333",
       "email": "cclientowski@gmail.com"
-    }
+    },
+    "services": [
+      {
+        "id": 1,
+        "description": "Dusting",
+        "priceRatio": 1.2
+      },
+      {
+        "id": 2,
+        "description": "Floors",
+        "priceRatio": 1.8
+      },
+      {
+        "id": 3,
+        "description": "Window Cleaning",
+        "priceRatio": 2
+      }
+    ]
   }
 ].map(order => OrderUtils.processOrder(order));
 
@@ -82,5 +116,22 @@ export const mockOrderItem: Order = OrderUtils.processOrder({
     "address": "ul. Sienkiewicza 3",
     "phoneNumber": "111222333",
     "email": "cclientowski@gmail.com"
-  }
+  },
+  "services": [
+    {
+      "id": 1,
+      "description": "Dusting",
+      "priceRatio": 1.2
+    },
+    {
+      "id": 2,
+      "description": "Floors",
+      "priceRatio": 1.8
+    },
+    {
+      "id": 3,
+      "description": "Window Cleaning",
+      "priceRatio": 2
+    }
+  ]
 });

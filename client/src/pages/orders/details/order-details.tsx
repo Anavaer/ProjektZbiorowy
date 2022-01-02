@@ -6,6 +6,7 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 import HomeIcon from "@mui/icons-material/Home";
 import MapIcon from "@mui/icons-material/Map";
+import PhoneIcon from '@mui/icons-material/Phone';
 import { Alert, Avatar, Box, Button, ButtonGroup, Card, CardContent, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Link, List, ListItem, ListItemAvatar, ListItemText, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { red } from "@mui/material/colors";
 import moment from "moment";
@@ -19,7 +20,7 @@ import { OrderUtils } from "utils/order-utils";
 import { CustomSnackbarOptions } from '../../../utils/CustomSnackbarOptions';
 import { OrderEmployee } from '../components/order-employee/order-employee';
 import { OrderStatusWidget } from '../components/order-status/order-status-widget';
-import { OrderStatusStateChangeCallbackBuilder } from '../components/order-status/OrderStatusChangeCallbackFactory';
+import { OrderStatusStateChangeCallbackBuilder } from '../components/order-status/OrderStatusStateChangeCallbackBuilder';
 import { OrderDetailsDialogBoxOptions } from './OrderDetailsDialogBoxOptions';
 
 export function OrderDetails() {
@@ -126,21 +127,23 @@ export function OrderDetails() {
       >
         <Alert severity={customSnackbarOptions.severity}>{customSnackbarOptions.message}</Alert>
       </Snackbar>
-      <Container component="main" maxWidth="xl" sx={{ padding: '20px 0' }}>
+      <Container component="main" maxWidth="xl" sx={{ padding: '20px 0' }} role="order-details-container">
         <Grid container spacing={2} alignItems="stretch">
           <Grid item xs={12}>
             <Card>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '16px'
-              }}>
+              <Box 
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px'
+                }}
+              >
                 <Typography component="h5" variant="h5">Szczegóły zamówienia</Typography>
-                <OrderEmployee 
-                  employee={order?.employee} 
-                  client={order?.client} 
-                  onChangeAssignment={assignOrder} 
+                <OrderEmployee
+                  employee={order?.employee}
+                  client={order?.client}
+                  onChangeAssignment={assignOrder}
                 />
               </Box>
             </Card>
@@ -162,6 +165,7 @@ export function OrderDetails() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
+                      role="order-details-service-date"
                       primary={moment(order?.serviceDate).locale("pl").format("DD MMMM yyyy, HH:mm:ss")}
                       secondary="Data złożenia zamówienia" />
                   </ListItem>
@@ -172,7 +176,8 @@ export function OrderDetails() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={<span>{order?.area} m<sup>2</sup></span>}
+                      role="order-details-area"
+                      primary={<span>{order?.area}m<sup>2</sup></span>}
                       secondary="Powierzchnia apartamentu" />
                   </ListItem>
                 </List>
@@ -199,7 +204,7 @@ export function OrderDetails() {
                     </TableHead>
                     <TableBody>
                       {order?.servicePrices.map(servicePrice => (
-                        <TableRow>
+                        <TableRow key={"order-details-service-price" + servicePrice.id} role="order-details-service-price">
                           <TableCell>{servicePrice.id}</TableCell>
                           <TableCell>{servicePrice.description}</TableCell>
                           <TableCell align="right">{(servicePrice.priceRatio * order?.totalPrice).toFixed(2)}zł</TableCell>
@@ -208,7 +213,7 @@ export function OrderDetails() {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Łączna cena</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: red[500] }} align="right">{order?.totalPrice.toFixed(2)}zł</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: red[500] }} align="right" role="order-details-total-price">{order?.totalPrice.toFixed(2)}zł</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -226,6 +231,7 @@ export function OrderDetails() {
                       <Avatar />
                     </ListItemAvatar>
                     <ListItemText
+                      role="order-details-client-name"
                       primary={order?.client.firstName + " " + order?.client.lastName}
                       secondary="Imię i nazwisko" />
                   </ListItem>
@@ -235,7 +241,8 @@ export function OrderDetails() {
                         <HomeIcon />
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText 
+                    <ListItemText
+                      role="order-details-client-address"
                       primary={order?.client.city + ", " + order?.client.address}
                       secondary="Adres zamieszkania"/>
                   </ListItem>
@@ -246,21 +253,32 @@ export function OrderDetails() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={order?.client.city + ", " + order?.client.address}
-                      secondary="Adres zamieszkania" />
+                      role="order-details-client-company-name"
+                      primary={order?.client.companyName}
+                      secondary="Nazwa firmy" />
                   </ListItem>
-                  {order?.client.email != null ? (
-                    <ListItem>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <AlternateEmailIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={order?.client.email}
-                        secondary="Adres e-mail" />
-                    </ListItem>
-                  ) : null}
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <AlternateEmailIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      role="order-details-client-email"
+                      primary={order?.client.email}
+                      secondary="Adres e-mail" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <PhoneIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      role="order-details-client-phone"
+                      primary={order?.client.phoneNumber}
+                      secondary="Numer telefonu" />
+                  </ListItem>
                   <ListItem>
                     <ListItemAvatar>
                       <Avatar>
@@ -268,6 +286,7 @@ export function OrderDetails() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
+                      role="order-details-client-nip"
                       primary={order?.client.nip}
                       secondary="NIP" />
                   </ListItem>
@@ -299,18 +318,21 @@ export function OrderDetails() {
       </Dialog>
     </div>
   ) : (
-    <Box sx={{ 
-      width: '100%', 
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column'
-    }}>
+    <Box 
+      sx={{ 
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column'
+      }}
+      role="order-details-not-found"
+    >
       <Typography component="h1" variant="h5" color="text.secondary" textAlign="center">
         Nie udało się znaleźć zamówienia o wprowadzonych parametrach
       </Typography>
-      <Link href="" onClick={() => navigate('/')}>Powrót na stronę główną</Link>
+      <Link href="" onClick={() => navigate('/')} role="order-details-not-found-link">Powrót na stronę główną</Link>
     </Box>
   );
 }

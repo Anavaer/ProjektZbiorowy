@@ -54,7 +54,8 @@ namespace API.Controllers
                                                       orderBy: x => x.OrderByDescending(x => x.ServiceDate),
                                                      includes: x => x.Include(x => x.OrderStatus)
                                                                      .Include(x => x.Employee))).ToOrderDescriptionsDto());
-            }else
+            }
+            else
                 return BadRequest("Orders not found.");
         }
 
@@ -62,7 +63,7 @@ namespace API.Controllers
         [Authorize(Roles = "Administrator,Worker,Client")]
         public async Task<ActionResult> GetOrder(int id)
         {
-            var order = await ordersRepo.Get(filter: x => x.OrderId ==id,
+            var order = await ordersRepo.Get(filter: x => x.OrderId == id,
                                              includes: x => x.Include(x => x.OrderStatus)
                                                                    .Include(x => x.Employee));
             if (order == null)
@@ -258,7 +259,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private float CalculateTotalPrice(int area, IEnumerable<ServicePrice> services)
+        public static float CalculateTotalPrice(int area, IEnumerable<ServicePrice> services)
         {
             float totalPrice = 0;
             foreach (var service in services)

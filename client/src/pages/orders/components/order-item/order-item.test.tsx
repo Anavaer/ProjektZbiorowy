@@ -49,7 +49,7 @@ describe("OrderItemTest", () => {
       backgroundColor: colors.background,
       color: colors.color
     });
-    expect(orderItemStatus).toHaveTextContent("NEW");
+    expect(orderItemStatus).toHaveTextContent(mockOrderItem.orderStatus.description);
     expect(orderItemPrice).toHaveTextContent(mockOrderItem.totalPrice.toFixed(2) + "zł");
     expect(orderItemPersonDetails).toHaveTextContent(mockOrderItem.client.firstName + " " + mockOrderItem.client.lastName);
     expect(orderItemServiceDate).toHaveTextContent(moment(mockOrderItem.serviceDate).locale("pl").format("DD MMMM yyyy"));

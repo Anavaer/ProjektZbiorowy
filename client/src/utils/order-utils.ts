@@ -4,15 +4,9 @@ import { Order } from "types";
 
 export class OrderUtils {
 
-  // TODO: Wywalić pętlę, która dodaje usługi, jak dostanę dane z backendu
   public static processOrder(input: any): Order {
     input.serviceDate = new Date(input.serviceDate);
     input.totalPrice = Math.floor(input.totalPrice * 100) / 100;
-    input.servicePrices = [];
-    
-    for(let i = 0; i < 3; i++) {
-      input.servicePrices.push({id: i + 1, description: `Service price ${i + 1}`, priceRatio: 0.3})
-    }
     
     return input;
   }

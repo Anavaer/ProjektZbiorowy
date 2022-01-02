@@ -67,19 +67,19 @@ export function OrderEmployee(props: OrderEmployeeProps) {
               </MenuItem>
             )}
             {UserRoleUtils.isAdmin(cookies.role) && (
-              <MenuItem onClick={openAssignWorkerDialog}>
+              <MenuItem onClick={openAssignWorkerDialog} role="employee-assign-to-employee-menu-item">
                 <PersonAddAltIcon sx={{ marginRight: '10px' }} />
                 Przypisz do pracownika
               </MenuItem>
             )}
           </Menu>
-          <Dialog open={dialogOpened} onClose={() => setDialogOpened(false)}>
+          <Dialog open={dialogOpened} onClose={() => setDialogOpened(false)} role="employee-assign-to-employee-dialog">
             <DialogTitle>
               Wybierz pracownika
             </DialogTitle>
             <List>
               {users.map(user => (
-                <ListItem button onClick={() => onChangeAssignment(user)}>
+                <ListItem button onClick={() => onChangeAssignment(user)} role="employee-assign-to-employee-list-item">
                   <ListItemAvatar>
                     <Avatar sx={{ bgcolor: red[500] }}>
                       {user.firstName && user.firstName[0]}

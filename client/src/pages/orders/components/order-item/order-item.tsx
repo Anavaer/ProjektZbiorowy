@@ -61,7 +61,7 @@ export function OrderItem(props : OrderItemProps) {
 
 
   return (
-    <Grid item xl={3} md={4} sm={6} xs={12} sx={{ position: 'relative' }}>
+    <Grid item xl={3} md={4} sm={6} xs={12} sx={{ position: 'relative' }} role="order-item">
       <Card sx={{ minWidth: 200 }}>
         <CardContent>
           <Box sx={{ 
@@ -69,7 +69,7 @@ export function OrderItem(props : OrderItemProps) {
             alignItems: 'center', 
             justifyContent: 'space-between',
           }}>
-            <Paper sx={orderStateColors}>
+            <Paper sx={orderStateColors} role="order-item-status">
               {order.orderStatus.description}
             </Paper>
             <Typography 
@@ -78,7 +78,8 @@ export function OrderItem(props : OrderItemProps) {
               sx={{ 
                 color: red[500],
                 fontWeight: 'bold'
-              }}>
+              }}
+              role="order-item-price">
               {order.totalPrice.toFixed(2)}zł
             </Typography>
           </Box>
@@ -90,7 +91,11 @@ export function OrderItem(props : OrderItemProps) {
                     <PersonIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={order.client.firstName + " " + order.client.lastName} />
+                <ListItemText
+                  role="order-item-person-details"
+                  primary={order.client.firstName + " " + order.client.lastName}
+                  secondary="Imię i nazwisko klienta"
+                />
               </ListItem>
               <ListItem>
                 <ListItemAvatar>
@@ -98,7 +103,11 @@ export function OrderItem(props : OrderItemProps) {
                     <EventNoteIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={moment(order.serviceDate).locale("pl").format("DD MMMM yyyy")} />
+                <ListItemText
+                  role="order-item-service-date"
+                  primary={moment(order.serviceDate).locale("pl").format("DD MMMM yyyy")}
+                  secondary="Data ralizacji zamówienia"
+                />
               </ListItem>
               <ListItem>
                 <ListItemAvatar>
@@ -106,7 +115,11 @@ export function OrderItem(props : OrderItemProps) {
                     <MapIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={<span>{order.area} m<sup>2</sup></span>} />
+                <ListItemText
+                  role="order-item-area"
+                  primary={<span>{order.area}m<sup>2</sup></span>}
+                  secondary="Powierzchnia"
+                />
               </ListItem>
             </List>
           </Box>
@@ -121,6 +134,7 @@ export function OrderItem(props : OrderItemProps) {
             aria-controls={"order-menu-" + order.orderId}
             aria-haspopup="true"
             startIcon={<InfoIcon />}
+            role="order-item-details-button"
             onClick={() => navigate(`/orders/${order.orderId}`)}>
             Szczegóły
           </Button>

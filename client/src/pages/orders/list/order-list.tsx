@@ -142,6 +142,7 @@ export function OrderList() {
   return (
     <div>
       <Snackbar
+        role="order-list-snackbar"
         open={customSnackbarOptions.opened}
         autoHideDuration={4000}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -150,13 +151,16 @@ export function OrderList() {
         <Alert severity={customSnackbarOptions.severity}>{customSnackbarOptions.message}</Alert>
       </Snackbar>
       <Container component="main" maxWidth="xl">
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '100px'
-        }}>
+        <Box 
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: '100px'
+          }}
+          role="order-list-header"
+        >
           <Box>
             <Typography component="h1" variant="h5">Zamówienia</Typography>
             <Typography component="p" variant="subtitle1" color="text.secondary">
@@ -164,6 +168,7 @@ export function OrderList() {
             </Typography>
           </Box>
           <Button
+            role="order-list-open-dialog-button"
             variant="contained"
             size="large"
             startIcon={<AddIcon />}
@@ -171,11 +176,18 @@ export function OrderList() {
         </Box>
 
         <Grid container spacing={2}>
-          {orders.map(order => (<OrderItem order={order} onChangeAssignment={assignOrder} />))}
+          {orders.map(order => (
+            <OrderItem 
+              key={"order-list-item" + order.orderId} 
+              order={order} 
+              onChangeAssignment={assignOrder} 
+            />
+          ))}
         </Grid>
       </Container>
 
       <Dialog
+        role="order-list-dialog"
         maxWidth="lg"
         fullWidth={true}
         open={createOrderModalOpened}
@@ -193,6 +205,7 @@ export function OrderList() {
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
                           <TextField
+                            role="order-list-form-field-city"
                             margin='normal'
                             required
                             fullWidth
@@ -204,6 +217,7 @@ export function OrderList() {
                         </Grid>
                         <Grid item xs={6}>
                           <TextField
+                            role="order-list-form-field-address"
                             margin='normal'
                             required
                             fullWidth
@@ -215,13 +229,14 @@ export function OrderList() {
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
+                            role="order-list-form-field-area"
                             margin='normal'
                             required
                             fullWidth
                             id='area'
                             label='Powierzchnia'
                             name='area'
-                            type="number"
+                            
                             onChange={evt => setCreatedOrder({ ...createdOrder, area: parseInt(evt.currentTarget.value) })}
                           />
                         </Grid>
@@ -242,11 +257,12 @@ export function OrderList() {
                     <CardContent>
                       <Grid container spacing={2} sx={{ display: 'flex', alignItems: 'center' }}>
                         <Grid item xs={9}>
-                          <FormControl variant="standard" fullWidth={true}>
+                          <FormControl variant="standard" fullWidth={true} role="order-list-form-field-service-date">
                             <LocalizationProvider dateAdapter={DateAdapter}>
                               <DateTimePicker
                                 label="Data zamówienia"
                                 value={selectedServiceDate}
+                                inputFormat="DD MMM yyyy, HH:mm"
                                 onChange={handleDateTimePickerChange}
                                 renderInput={(params) => <TextField {...params} />}
                                 minDate={moment(new Date()).add(1, 'minutes')}
@@ -262,6 +278,7 @@ export function OrderList() {
                           >
                             <span>
                               <Button
+                                role="order-list-service-date-add-button"
                                 variant="contained"
                                 size="large"
                                 startIcon={<AddIcon />}
@@ -274,17 +291,22 @@ export function OrderList() {
                         </Grid>
                         <Grid item xs={12}>
                           {createdOrder.serviceDates.map(serviceDate => (
-                            <Card sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              bgcolor: blue[700],
-                              color: 'white'
-                            }}>
+                            <Card
+                              role="order-list-service-date"
+                              key={"order-list-service-date-" + serviceDate}
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                bgcolor: blue[700],
+                                color: 'white'
+                              }}
+                            >
                               <Box sx={{ padding: "8px" }}>
-                                <Typography>{moment(serviceDate).locale("pl").format("DD MMM yyyy, HH:mm:ss")}</Typography>
+                                <Typography>{moment(serviceDate).locale("pl").format("DD MMM yyyy, HH:mm")}</Typography>
                               </Box>
-                              <IconButton 
+                              <IconButton
+                                role="order-list-service-date-delete-button"
                                 aria-label="delete" 
                                 color="error" 
                                 onClick={() => removeServiceDateFromOrder(serviceDate)}
@@ -313,7 +335,9 @@ export function OrderList() {
                 <CardContent>
                   <List>
                     {servicePrices.map(servicePrice => (
-                      <ListItemButton 
+                      <ListItemButton
+                        role="order-list-service-price"
+                        key={"order-list-service-price-" + servicePrice.id}
                         onClick={() => selectService(servicePrice)}
                         selected={createdOrder.servicePriceIds.includes(servicePrice.id)}>
                         <ListItemAvatar>
@@ -333,8 +357,8 @@ export function OrderList() {
             </Grid>
             <Grid item xs={12}>
               <Card variant="outlined" sx={{ padding: '20px', color: red[500] }}>
-                <Typography component="h5" variant="h5" align="right">
-                  Łączna kwota: <b>{((createdOrder.area && createdOrder.servicePriceIds.length > 0) ? servicePrices.filter(x => createdOrder.servicePriceIds.includes(x.id)).map(x => x.priceRatio).reduce((a, b) => a + b, 0) * createdOrder.area : 0).toFixed(2)}zł</b>
+                <Typography component="h5" variant="h5" align="right" role="order-list-total-price">
+                  Łączna kwota: <b>{(servicePrices.filter(x => createdOrder.servicePriceIds.includes(x.id)).map(x => x.priceRatio).reduce((a, b) => a + b, 0) * createdOrder.area).toFixed(2)}zł</b>
                 </Typography>
               </Card>
             </Grid>
@@ -343,6 +367,7 @@ export function OrderList() {
         <DialogActions>
           <ButtonGroup variant="contained">
             <Button
+              role="order-item-create-order-approve"
               color="success"
               startIcon={<DoneIcon />}
               disabled={!createOrderValid}

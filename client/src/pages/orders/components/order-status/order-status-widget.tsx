@@ -56,10 +56,11 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
 
   return (
     <div>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ display: "flex", alignItems: "center" }} role="order-status-widget">
         <Typography component="p" variant="subtitle1">Status zamówienia</Typography>
         <Box sx={{ m: 1, position: 'relative' }}>
           <Button
+            role="order-status-widget-button"
             variant="contained"
             size="large"
             endIcon={<ExpandMoreIcon />}
@@ -92,8 +93,9 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
         </Box>
       </Box>
       <Menu
-        id="order-status-menu"
-        MenuListProps={{ 'aria-labelledby': "order-status-menu" }}
+        id="order-status-widget-menu"
+        role="order-status-widget-menu"
+        MenuListProps={{ 'aria-labelledby': "order-status-widget-menu" }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         anchorEl={anchorEl}
@@ -110,6 +112,8 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
             let colors = OrderUtils.getOrderStatusColor(status.description);
             return (
               <MenuItem
+                key={"order-status-widget-menu-item-" + status.orderStatusId}
+                role="order-status-widget-menu-item"
                 sx={{
                   ...colors,
                   fontWeight: 'bold',

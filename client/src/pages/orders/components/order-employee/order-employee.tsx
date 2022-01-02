@@ -34,7 +34,7 @@ export function OrderEmployee(props: OrderEmployeeProps) {
 
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center'}}>
+    <Box sx={{ display: 'flex', alignItems: 'center' }} role="order-employee-widget">
       {employee == null ? (
         <div>
           <Box
@@ -44,10 +44,11 @@ export function OrderEmployee(props: OrderEmployeeProps) {
               justifyContent: 'flex-end',
               cursor: 'pointer'
             }}
+            role="unassigned-employee-box"
             onClick={event => setAnchorEl(event.currentTarget)}
             aria-controls="order-employee-menu">
             <Typography variant="body2" sx={{ fontStyle: 'oblique' }}>Nieprzypisany</Typography>
-            <Avatar sx={{ bgcolor: grey[500], marginLeft: '10px' }}></Avatar>
+            <Avatar sx={{ bgcolor: grey[500], marginLeft: '10px' }} role="employee-avatar"></Avatar>
           </Box>
           <Menu
             id="order-employee-menu"
@@ -58,7 +59,7 @@ export function OrderEmployee(props: OrderEmployeeProps) {
             open={optionsOpened}
             onClose={() => setAnchorEl(null)}
           >
-            <MenuItem onClick={() => onChangeAssignment()}>
+            <MenuItem onClick={() => onChangeAssignment()} role="employee-assign-to-me-menu-item">
               <PersonAddAltIcon sx={{ marginRight: '10px' }} />
               Przypisz do mnie
             </MenuItem>
@@ -87,15 +88,18 @@ export function OrderEmployee(props: OrderEmployeeProps) {
           </Dialog>
         </div>
       ) : (
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end'
-        }}>
+        <Box 
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end'
+          }}
+          role="employee-data-box"
+        >
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
             {employee.firstName} {employee.lastName}
           </Typography>
-          <Avatar sx={{ bgcolor: red[500], marginLeft: '10px' }}>
+          <Avatar sx={{ bgcolor: red[500], marginLeft: '10px' }} role="employee-avatar">
             <b>{employee.firstName[0]}</b>
           </Avatar>
         </Box>

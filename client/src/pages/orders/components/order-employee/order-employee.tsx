@@ -6,12 +6,13 @@ import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import { useCookies } from 'react-cookie';
 import { AdminService } from 'services/admin/admin-service';
 import { User } from 'types';
+import { UserRoleUtils } from 'utils/user-role-utils';
 
 export function OrderEmployee(props: OrderEmployeeProps) {
   const { employee, client, onChangeAssignment } = props;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>();
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["token", "role"]);
   const [dialogOpened, setDialogOpened] = React.useState(false);
   const [users, setUsers] = React.useState<User[]>([]);
 
@@ -23,7 +24,7 @@ export function OrderEmployee(props: OrderEmployeeProps) {
 
   const openAssignWorkerDialog = (): void => {
     adminService.getUsers()
-      .then(res => setUsers(res.filter(x => x.id != client?.id)))
+      .then(res => setUsers(res.filter(x => x.id != client?.id && (UserRoleUtils.isWorker(x.roles) || UserRoleUtils.isAdmin(x.roles)))))
       .then(() => setDialogOpened(true))
       .then(() => setAnchorEl(null));
   }
@@ -42,10 +43,10 @@ export function OrderEmployee(props: OrderEmployeeProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              cursor: 'pointer'
+              cursor: (UserRoleUtils.isWorker(cookies.role) ? 'pointer' : 'inherit')
             }}
             role="unassigned-employee-box"
-            onClick={event => setAnchorEl(event.currentTarget)}
+            onClick={event => UserRoleUtils.isWorker(cookies.role) && setAnchorEl(event.currentTarget)}
             aria-controls="order-employee-menu">
             <Typography variant="body2" sx={{ fontStyle: 'oblique' }}>Nieprzypisany</Typography>
             <Avatar sx={{ bgcolor: grey[500], marginLeft: '10px' }} role="employee-avatar"></Avatar>
@@ -59,15 +60,18 @@ export function OrderEmployee(props: OrderEmployeeProps) {
             open={optionsOpened}
             onClose={() => setAnchorEl(null)}
           >
-            <MenuItem onClick={() => onChangeAssignment()} role="employee-assign-to-me-menu-item">
-              <PersonAddAltIcon sx={{ marginRight: '10px' }} />
-              Przypisz do mnie
-            </MenuItem>
-            {/* TODO: enable option for admin */}
-            {/* <MenuItem onClick={openAssignWorkerDialog}>
-              <PersonAddAltIcon sx={{ marginRight: '10px' }} />
-              Przypisz do...
-            </MenuItem> */}
+            {UserRoleUtils.isWorker(cookies.role) && (
+              <MenuItem onClick={() => onChangeAssignment()} role="employee-assign-to-me-menu-item">
+                <PersonAddAltIcon sx={{ marginRight: '10px' }} />
+                Przypisz do mnie
+              </MenuItem>
+            )}
+            {UserRoleUtils.isAdmin(cookies.role) && (
+              <MenuItem onClick={openAssignWorkerDialog}>
+                <PersonAddAltIcon sx={{ marginRight: '10px' }} />
+                Przypisz do pracownika
+              </MenuItem>
+            )}
           </Menu>
           <Dialog open={dialogOpened} onClose={() => setDialogOpened(false)}>
             <DialogTitle>

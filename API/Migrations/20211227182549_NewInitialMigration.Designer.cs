@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211216190330_ChangeInOrderToServicePriceRelation")]
-    partial class ChangeInOrderToServicePriceRelation
+    [Migration("20211227182549_NewInitialMigration")]
+    partial class NewInitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -241,9 +241,6 @@ namespace API.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<float>("PriceRatio")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<float>("UnitPrice")
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");

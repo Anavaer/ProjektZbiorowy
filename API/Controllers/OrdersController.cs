@@ -37,49 +37,83 @@ namespace API.Controllers
         [Authorize(Roles = "Administrator,Worker,Client")]
         public async Task<ActionResult> GetOrders()
         {
+            var currentUserId = User.GetId();
+
             if ((await ordersRepo.GetAll()).Any())
-            { 
-            if (User.IsInRole("Administrator"))
+            {
+                if (User.IsInRole("Administrator"))
+                {
+                    return Ok((await ordersRepo.GetAll(
+                                                    orderBy: x => x.OrderByDescending(x => x.ServiceDate),
+                                                    includes: x => x.Include(x => x.OrderStatus)
+                                                                    .Include(x => x.Employee)
+                                                                    .Include(x => x.Client)
+                                                                    .Include(x => x.ServicePrices)))
+                                                                    .ToOrderDescriptionsDto());
+                }
+
+                if (User.IsInRole("Worker"))
+                {
+                    return Ok((await ordersRepo.GetAll(
+                                                    filter: x => x.EmployeeId == currentUserId
+                                                                || (x.EmployeeId == null && x.OrderStatus.OrderStatusId == 2)
+                                                                || x.ClientId == currentUserId,
+                                                    orderBy: x => x.OrderByDescending(x => x.ServiceDate),
+                                                    includes: x => x.Include(x => x.OrderStatus)
+                                                                     .Include(x => x.Employee)
+                                                                     .Include(x => x.Client)
+                                                                     .Include(x => x.ServicePrices)))
+                                                                     .ToOrderDescriptionsDto());
+                }
+
                 return Ok((await ordersRepo.GetAll(
-                     orderBy: x => x.OrderByDescending(x => x.ServiceDate),
-                    includes: x => x.Include(x => x.OrderStatus)
-                                    .Include(x => x.Employee))).ToOrderDescriptionsDto());
-            else if (User.IsInRole("Worker"))
-                return Ok((await ordersRepo.GetAll(filter: x => x.EmployeeId == User.GetId() || x.OrderStatus.OrderStatusId == 1,
-                                                  orderBy: x => x.OrderByDescending(x => x.ServiceDate),
-                                                 includes: x => x.Include(x => x.OrderStatus)
-                                                                 .Include(x => x.Employee))).ToOrderDescriptionsDto());
-            else
-                return Ok((await ordersRepo.GetAll(filter: x => x.ClientId == User.GetId(),
-                                                  orderBy: x => x.OrderByDescending(x => x.ServiceDate),
-                                                 includes: x => x.Include(x => x.OrderStatus)
-                                                                 .Include(x => x.Employee))).ToOrderDescriptionsDto());
-            }else
-                return BadRequest("Orders not found.");
+                                                filter: x => x.ClientId == currentUserId,
+                                                orderBy: x => x.OrderByDescending(x => x.ServiceDate),
+                                                includes: x => x.Include(x => x.OrderStatus)
+                                                                .Include(x => x.Employee)
+                                                                .Include(x => x.Client)
+                                                                .Include(x => x.ServicePrices)))
+                                                                .ToOrderDescriptionsDto());
+            }
+
+            return BadRequest("No orders found.");
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Administrator,Worker,Client")]
         public async Task<ActionResult> GetOrder(int id)
         {
-          var order = await ordersRepo.Get(filter: x => x.OrderId ==id,                                               
-                                           includes: x => x.Include(x => x.OrderStatus)
-                                                                 .Include(x => x.Employee));
+            var order = await ordersRepo.Get(filter: x => x.OrderId == id,
+                                             includes: x => x.Include(x => x.OrderStatus)
+                                                             .Include(x => x.Employee)
+                                                             .Include(x => x.Client)
+                                                             .Include(x => x.ServicePrices));
             if (order == null)
                 return BadRequest("Order not found.");
 
+            var currentUserId = User.GetId();
+
             if (User.IsInRole("Administrator"))
+            {
+                return Ok(order.ToOrderDescriptionDto());
+            }
+
+            if (User.IsInRole("Worker"))
+            {
+                if (order.EmployeeId == currentUserId
+                    || (order.EmployeeId == null && order.OrderStatus.OrderStatusId == 2)
+                    || order.ClientId == currentUserId)
+                {
                     return Ok(order.ToOrderDescriptionDto());
-            else if (User.IsInRole("Worker"))
-                    if (order.EmployeeId == User.GetId() || order.OrderStatus.OrderStatusId == 1)
-                        return Ok(order.ToOrderDescriptionDto());
-                    else
-                        return BadRequest("Either the order is not assigned to the user or its status is different from 'NEW'");             
-            else
-                        if (order.ClientId == User.GetId())
-                             return Ok(order.ToOrderDescriptionDto());
-                        else
-                             return BadRequest("Order does not belong to the specific client.");
+                }
+            }
+
+            if (User.IsInRole("Client") && order.ClientId == currentUserId)
+            {
+                return Ok(order.ToOrderDescriptionDto());
+            }
+
+            return BadRequest($"No permissions to get order of id {id}");
         }
 
         [HttpPost("create")]
@@ -107,7 +141,7 @@ namespace API.Controllers
                     City = orderDto.City,
                     Address = orderDto.Address,
                     Area = orderDto.Area,
-                    TotalPrice = calculateTotalPrice(orderDto.Area, services),
+                    TotalPrice = CalculateTotalPrice(orderDto.Area, services),
                     ServicePrices = (ICollection<ServicePrice>)services
                 });
             }
@@ -174,7 +208,7 @@ namespace API.Controllers
             {
                 return BadRequest("Invalid OrderId.");
             }
-            if (order.OrderStatus.Description != "NEW" || order.OrderStatus.Description != "CONFIRMED")
+            if (!(order.OrderStatus.Description == "NEW" || order.OrderStatus.Description == "CONFIRMED"))
             {
                 return BadRequest("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.");
             }
@@ -258,7 +292,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        private float calculateTotalPrice(int area, IEnumerable<ServicePrice> services)
+        public static float CalculateTotalPrice(int area, IEnumerable<ServicePrice> services)
         {
             float totalPrice = 0;
             foreach (var service in services)

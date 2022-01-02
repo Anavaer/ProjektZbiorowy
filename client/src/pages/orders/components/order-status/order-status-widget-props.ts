@@ -1,5 +1,5 @@
 import { OrderStatus } from "types";
-import { OrderStatusStateChangeCallbackBuilder } from "./OrderStatusChangeCallbackFactory";
+import { OrderStatusStateChangeCallbackBuilder } from "./OrderStatusStateChangeCallbackBuilder";
 
 
 export interface OrderStatusWidgetProps {

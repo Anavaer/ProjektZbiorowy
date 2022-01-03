@@ -441,3 +441,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+API/dev.db-shm
+API/dev.db-wal

@@ -32,6 +32,7 @@ export function SignIn() {
 
       setCookie('username', data.username, { expires: date })
       setCookie('token', data.token, { expires: date })
+      setCookie('role', JSON.parse(atob(data.token.split('.')[1])).role);
       navigate('/')
     });
   };

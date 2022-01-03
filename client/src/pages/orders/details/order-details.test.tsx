@@ -94,7 +94,7 @@ describe("OrderDetailsTest", () => {
     for (let i = 0; i < mockOrderItem.services.length; i++) {
       expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.services[i].id + "");
       expect(orderDetailsServicePrices[i]).toHaveTextContent(mockOrderItem.services[i].description);
-      expect(orderDetailsServicePrices[i]).toHaveTextContent((mockOrderItem.services[i].priceRatio * mockOrderItem?.totalPrice).toFixed(2) + "zł");
+      expect(orderDetailsServicePrices[i]).toHaveTextContent((mockOrderItem.services[i].priceRatio * mockOrderItem?.area).toFixed(2) + "zł");
     }
 
     expect(orderDetailsTotalPrice).toHaveTextContent(mockOrderItem.totalPrice.toFixed(2) + "zł");

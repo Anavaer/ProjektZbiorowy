@@ -207,7 +207,7 @@ export function OrderDetails() {
                         <TableRow key={"order-details-service-price" + servicePrice.id} role="order-details-service-price">
                           <TableCell>{servicePrice.id}</TableCell>
                           <TableCell>{servicePrice.description}</TableCell>
-                          <TableCell align="right">{(servicePrice.priceRatio * order?.totalPrice).toFixed(2)}zł</TableCell>
+                          <TableCell align="right">{(servicePrice.priceRatio * order?.area).toFixed(2)}zł</TableCell>
                         </TableRow>
                       ))}
                       <TableRow>

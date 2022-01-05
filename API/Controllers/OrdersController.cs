@@ -55,7 +55,7 @@ namespace API.Controllers
                 {
                     return Ok((await ordersRepo.GetAll(
                                                     filter: x => x.EmployeeId == currentUserId
-                                                                || (x.EmployeeId == null && x.OrderStatus.OrderStatusId == 2)
+                                                                || (x.EmployeeId == null && x.OrderStatus.OrderStatusId == 1)
                                                                 || x.ClientId == currentUserId,
                                                     orderBy: x => x.OrderByDescending(x => x.ServiceDate),
                                                     includes: x => x.Include(x => x.OrderStatus)

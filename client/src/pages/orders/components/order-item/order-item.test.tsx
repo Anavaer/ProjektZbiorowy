@@ -37,12 +37,12 @@ describe("OrderItemTest", () => {
   test("should render component correctly", async () => {
     const colors = OrderUtils.getOrderStatusColor(mockOrderItem.orderStatus.description);
 
-    const orderItem = await screen.findByRole("service-item");
-    const orderItemStatus = await screen.findByRole("service-item-status");
-    const orderItemPrice = await screen.findByRole("service-item-price");
-    const orderItemPersonDetails = await screen.findByRole("service-item-person-details");
-    const orderItemServiceDate = await screen.findByRole("service-item-service-date");
-    const orderItemArea = await screen.findByRole("service-item-area");
+    const orderItem = await screen.findByRole("order-item");
+    const orderItemStatus = await screen.findByRole("order-item-status");
+    const orderItemPrice = await screen.findByRole("order-item-price");
+    const orderItemPersonDetails = await screen.findByRole("order-item-person-details");
+    const orderItemServiceDate = await screen.findByRole("order-item-service-date");
+    const orderItemArea = await screen.findByRole("order-item-area");
 
     expect(orderItem).toBeInTheDocument();
     expect(orderItemStatus).toHaveStyle({
@@ -58,7 +58,7 @@ describe("OrderItemTest", () => {
   });
 
   test("After clicking details button it should route to details page", async () => {
-    const orderItemDetailsButton = await screen.findByRole("service-item-details-button");
+    const orderItemDetailsButton = await screen.findByRole("order-item-details-button");
 
     fireEvent.click(orderItemDetailsButton);
 

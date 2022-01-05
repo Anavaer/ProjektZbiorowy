@@ -70,7 +70,7 @@ describe("OrderListTest", () => {
     );
 
     const orderListHeader = await screen.findByRole("order-list-header");
-    const orderItems = await screen.findAllByRole("service-item");
+    const orderItems = await screen.findAllByRole("order-item");
 
     expect(orderListHeader).toBeInTheDocument();
     expect(orderListHeader).toHaveTextContent("Zamówienia");
@@ -267,7 +267,7 @@ describe("OrderListTest", () => {
     const orderListFormFieldServiceDate = await screen.findByRole("order-list-form-field-service-date");
     const orderListServiceDateAddButton = await screen.findByRole("order-list-service-date-add-button");
     const orderListServicePrice = await screen.queryAllByRole("order-list-service-price");
-    const orderItemCreateOrderApprove = await screen.findByRole("service-item-create-order-approve");
+    const orderItemCreateOrderApprove = await screen.findByRole("order-item-create-order-approve");
     const date: Date = moment(new Date()).add(1, 'hours').toDate();
 
     await waitFor(() => {

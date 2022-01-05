@@ -4,9 +4,9 @@ namespace API.DTO
 {
     public class SignInDto
     {
-        [Required]
+        [Required(ErrorMessage = "Nazwa użytkownika jest wymagana.")]
         public string Username { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Hasło jest wymagane.")]
         public string Password { get; set; }
     }
 }

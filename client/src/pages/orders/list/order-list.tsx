@@ -483,7 +483,7 @@ export function OrderList() {
             <Grid item xs={12}>
               <Card variant="outlined" sx={{ padding: '20px', color: red[500] }}>
                 <Typography component="h5" variant="h5" align="right" role="order-list-total-price">
-                  Łączna kwota: <b>{(servicePrices.filter(x => createdOrder.servicePriceIds.includes(x.id)).map(x => x.priceRatio).reduce((a, b) => a + b, 0) * createdOrder.area).toFixed(2)}zł</b>
+                  Łączna kwota za pojedyńcze zamówienie: <b>{(servicePrices.filter(x => createdOrder.servicePriceIds.includes(x.id)).map(x => x.priceRatio).reduce((a, b) => a + b, 0) * createdOrder.area).toFixed(2)}zł</b>
                 </Typography>
               </Card>
             </Grid>

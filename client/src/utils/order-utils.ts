@@ -1,12 +1,13 @@
 import { blue, green, grey, red, yellow } from "@mui/material/colors";
 import { OrderStatusWidgetColorsOptions } from "pages/orders/components/order-status/order-status-widget-colors-props";
-import { Order } from "types";
+import { Order, OrderStatus } from "types";
 
 export class OrderUtils {
 
   public static processOrder(input: any): Order {
     input.serviceDate = new Date(input.serviceDate);
     input.totalPrice = Math.floor(input.totalPrice * 100) / 100;
+    input.orderStatus = OrderUtils.processOrderStatus(input.orderStatus);
     
     return input;
   }
@@ -28,4 +29,18 @@ export class OrderUtils {
   }
 
   public static isCompleted = (order?: Order): boolean => order?.orderStatus.description == "COMPLETED" || order?.orderStatus.description == "CANCELED";
+
+
+  public static processOrderStatus(input: OrderStatus): OrderStatus {
+
+    switch (input.description) {
+      case "NEW": input.visibleText = "Nowe"; break;
+      case "CONFIRMED": input.visibleText = "Zatwierdzone"; break;
+      case "ONGOING": input.visibleText = "W trakcie"; break;
+      case "COMPLETED": input.visibleText = "Zakończone"; break;
+      case "CANCELED": input.visibleText = "Anulowane"; break;
+    }
+
+    return input;
+  }
 }

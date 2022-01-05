@@ -100,7 +100,7 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
               boxShadow: statusList.length != 0 ? 'button.shadow' : 'none'
             }}
           >
-            {props.order?.orderStatus.description}
+            {props.order?.orderStatus.visibleText}
           </Button>
           {loading && (
             <CircularProgress
@@ -145,7 +145,7 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
                     'bgcolor': colors?.backgroundDark
                   }
                 }}
-                onClick={() => handleMenuItemSelect(status)}>{status.description}</MenuItem>
+                onClick={() => handleMenuItemSelect(status)}>{status.visibleText}</MenuItem>
             )
           })}
       </Menu>

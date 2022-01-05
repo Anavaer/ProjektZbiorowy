@@ -88,7 +88,7 @@ describe("OrderDetailsTest", () => {
     expect(orderDetailsArea).toHaveTextContent(mockOrderItem.area + "m2");
     expect(orderDetailsArea).toHaveTextContent("Powierzchnia apartamentu");
     expect(orderStatusWidget).toBeInTheDocument();
-    expect(orderStatusWidget).toHaveTextContent(mockOrderItem.orderStatus.description);
+    expect(orderStatusWidget).toHaveTextContent(mockOrderItem.orderStatus.visibleText!);
     expect(orderDetailsServicePrices.length).toBe(mockOrderItem.services.length);
 
     for (let i = 0; i < mockOrderItem.services.length; i++) {
@@ -169,6 +169,6 @@ describe("OrderDetailsTest", () => {
     );
 
 
-    expect(mockedNavigate).toHaveBeenCalledWith('/');
+    expect(mockedNavigate).toHaveBeenCalledWith('/sign-in');
   });
 });

@@ -26,6 +26,7 @@ function App() {
     removeCookie('username');
     removeCookie('token');
     removeCookie('role');
+    removeCookie('id');
     navigate('/');
   }
 

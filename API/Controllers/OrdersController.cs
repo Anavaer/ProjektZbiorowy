@@ -170,6 +170,8 @@ namespace API.Controllers
 
             if (User.IsInRole("Administrator"))
             {
+                employeeId ??= User.GetId();
+
                 var employee = await usersRepo.Get(filter: u => u.Id == employeeId,
                                                    includes: u => u.Include(r => r.UserRoles)
                                                                    .ThenInclude(r => r.Role));

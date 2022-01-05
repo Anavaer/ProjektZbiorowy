@@ -132,7 +132,7 @@ namespace Tests
         }
 
         [Test]
-        public async Task CancelOrder_Returns_NoContent_When_Order_Is_Cancelled_Successfully()
+        public async Task CancelOrder_Returns_NoContent_When_Order_Is_Canceled_Successfully()
         {
             // Arrange
             var userMock = new User { Id = 1 };

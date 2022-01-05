@@ -56,7 +56,8 @@ namespace API.Controllers
             return Ok(new IdentityDto
             {
                 Username = user.UserName,
-                Token = await this.jwtTokenService.NewJwtToken(user)
+                Token = await this.jwtTokenService.NewJwtToken(user),
+                Id = user.Id
             });
         }
 
@@ -78,7 +79,8 @@ namespace API.Controllers
             return Ok(new IdentityDto
             {
                 Username = user.UserName,
-                Token = await this.jwtTokenService.NewJwtToken(user)
+                Token = await this.jwtTokenService.NewJwtToken(user),
+                Id = user.Id
             });
         }
     }

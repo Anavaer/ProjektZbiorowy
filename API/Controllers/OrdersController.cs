@@ -122,7 +122,7 @@ namespace API.Controllers
             var services = await servicesRepo.GetAll(service => orderDto.ServicePriceIds.Contains(service.Id));
             if (services.Count() < 1)
             {
-                return BadRequest("Wszystkie podane usługi są nieprawidłowe.");
+                return BadRequest("Wszystkie wybrane usługi są nieprawidłowe.");
             }
 
             var client = await usersRepo.Get(u => u.Id == User.GetId());
@@ -161,7 +161,7 @@ namespace API.Controllers
             }
             if (order.OrderStatus.Description != "NEW")
             {
-                return BadRequest("Tylko zamowienia o statusie 'NEW' mogą być przypisane.");
+                return BadRequest("Tylko nowe zamowienia mogą być przypisane.");
             }
             if (order.ClientId == employeeId)
             {
@@ -209,14 +209,14 @@ namespace API.Controllers
             }
             if (!(order.OrderStatus.Description == "NEW" || order.OrderStatus.Description == "CONFIRMED"))
             {
-                return BadRequest("Tylko zamowienia o statusie 'NEW' lub 'CONFIRMED' mogą być anulowwane.");
+                return BadRequest("Tylko nowe i potwierdzone zamowienia mogą być anulowane.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
 
             if (order.ClientId != currentUser.Id)
             {
-                return BadRequest("Zamówienie może być anulowane tylko przez zamawiającego klienta.");
+                return BadRequest("Zamówienie może być anulowane tylko przez zamawiającego.");
             }
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELLED");
@@ -237,7 +237,7 @@ namespace API.Controllers
             }
             if (order.OrderStatus.Description != "CONFIRMED")
             {
-                return BadRequest("Tylko zamowienia o statusie 'CONFIRMED' mogą być rozpoczęte.");
+                return BadRequest("Tylko potwierdzone zamówienia mogą być rozpoczęte.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
@@ -265,7 +265,7 @@ namespace API.Controllers
             }
             if (order.OrderStatus.Description != "ONGOING")
             {
-                return BadRequest("Tylko zamowienia o statusie 'ONGOING' mogą być zakończone.");
+                return BadRequest("Tylko rozpoczęte zamówienia mogą być zakończone.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());

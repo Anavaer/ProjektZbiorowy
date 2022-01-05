@@ -9,7 +9,7 @@ namespace API.DTO
     public class OrderDto
     {
         [Required(ErrorMessage = "Pole Daty Realizacji są wymagane.")]
-        [DatesNotEmptyAndNotBeforeNow(ErrorMessage = "Daty Realizacji nie mogą być puste i muszą być późniejsze niż teraz.")]
+        [DatesNotEmptyAndNotBeforeNow(ErrorMessage = "Daty Realizacji nie mogą być puste i muszą być późniejsze niż obecna data.")]
         public IList<DateTime> ServiceDates { get; set; }
         [MaxLength(30, ErrorMessage = "Maksymalna długość dla pola Miasto to 30 znaków.")]
         [Required(ErrorMessage = "Pole Miasto jest wymagane.")]

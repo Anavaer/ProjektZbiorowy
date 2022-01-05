@@ -219,7 +219,7 @@ namespace API.Controllers
                 return BadRequest("Zamówienie może być anulowane tylko przez zamawiającego.");
             }
 
-            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELLED");
+            order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELED");
 
             return await SaveAndReturnActionResult("Wystąpił błąd podczas anulowania zamówienia.");
         }

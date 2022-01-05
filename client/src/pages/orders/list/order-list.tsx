@@ -80,7 +80,7 @@ export function OrderList() {
       orderService.getOrders().then(res => setOrders(res));
     }
     else {
-      navigate("/");
+      navigate("/sign-in");
     }
   }, []);
 

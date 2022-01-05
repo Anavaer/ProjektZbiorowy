@@ -64,7 +64,7 @@ export const UsersList = () => {
     if (cookies.token && cookies.role && cookies.role.includes("Administrator")) {
       adminService.getUsers().then(res => setUsers(res));
     } else {
-      navigate("/");
+      navigate("/sign-in");
     }
   }, []);
 

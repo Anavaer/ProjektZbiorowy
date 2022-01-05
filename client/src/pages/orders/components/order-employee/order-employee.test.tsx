@@ -131,6 +131,42 @@ describe("OrderEmployeeTest", () => {
   });
 
 
+  test("When worker is logged in, worker is owner and employee is unassigned, menu should not be displayed", async () => {
+    Object.defineProperty(document, "cookie", {
+      writable: true,
+      value: `token=test-token; role=["Client", "Worker"]; id=${mockUserList[0].id}`
+    });
+
+    render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);
+
+    const unassignedEmployeeBox = await screen.findByRole("unassigned-employee-box");
+    expect(unassignedEmployeeBox).toBeInTheDocument();
+
+    fireEvent.click(unassignedEmployeeBox);
+
+    const orderEmployeeMenu = await screen.queryByRole("order-employee-menu");
+    expect(orderEmployeeMenu).not.toBeInTheDocument();
+  });
+
+
+  test("When admin is logged in, admin is owner and employee is unassigned, menu should not be displayed", async () => {
+    Object.defineProperty(document, "cookie", {
+      writable: true,
+      value: `token=test-token; role=["Client", "Worker", "Admin"]; id=${mockUserList[0].id}`
+    });
+
+    render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);
+
+    const unassignedEmployeeBox = await screen.findByRole("unassigned-employee-box");
+    expect(unassignedEmployeeBox).toBeInTheDocument();
+
+    fireEvent.click(unassignedEmployeeBox);
+
+    const orderEmployeeMenu = await screen.queryByRole("order-employee-menu");
+    expect(orderEmployeeMenu).not.toBeInTheDocument();
+  });
+
+
   test("After clicking first item in menu, it should assign order to signed employee", async () => {
     Object.defineProperty(document, "cookie", {
       writable: true,

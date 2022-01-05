@@ -73,26 +73,26 @@ namespace API.Controllers
 
             if (user == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Nie znaleziono użytkownika.");
             }
 
             var rolesToSet = roles?.Split(",").ToList();
 
             if (rolesToSet.Count == 0)
             {
-                return NotFound("No roles to be set.");
+                return NotFound("Nie znaleziono ról.");
             }
 
             var currentRoles = await this.userManager.GetRolesAsync(user);
 
             if (!(await this.userManager.RemoveFromRolesAsync(user, currentRoles)).Succeeded)
             {
-                return BadRequest("Error has occurred when removing current roles.");
+                return BadRequest("Wystąpił błąd podczas usuwania obecnych ról.");
             }
 
             if (!(await this.userManager.AddToRolesAsync(user, rolesToSet)).Succeeded)
             {
-                return BadRequest("Error has occurred when adding new roles.");
+                return BadRequest("Wystąpił błąd podczas dodawania nowych ról.");
             }
 
             return NoContent();
@@ -124,7 +124,7 @@ namespace API.Controllers
 
             if (!(await this.unitOfWork.Save()))
             {
-                return BadRequest("Error has occurred when adding service.");
+                return BadRequest("Wystąpił błąd podczas dodawania usługi.");
             }
 
             return NoContent();
@@ -138,7 +138,7 @@ namespace API.Controllers
 
             if (service == null)
             {
-                return NotFound("Service not found.");
+                return NotFound("Nie znaleziono usługi.");
             }
 
             service.Description = serviceDto.Description;
@@ -148,7 +148,7 @@ namespace API.Controllers
 
             if (!(await this.unitOfWork.Save()))
             {
-                return BadRequest("Error has occurred when editing service.");
+                return BadRequest("Wystąpił błąd podczas edytowania usługi.");
             }
 
             return NoContent();

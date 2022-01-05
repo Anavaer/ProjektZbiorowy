@@ -11,14 +11,14 @@ namespace API.DataModel.SeedData
             {
                 return new List<ServicePrice>
                 {
-                    new ServicePrice { Description = "Window Cleaning", PriceRatio = 2.0F },
-                    new ServicePrice { Description = "Floors", PriceRatio = 1.8F },
-                    new ServicePrice { Description = "Dusting", PriceRatio = 1.2F },
-                    new ServicePrice { Description = "Washing Dishes", PriceRatio = 0.4F },
-                    new ServicePrice { Description = "Laundry", PriceRatio = 0.3F },
-                    new ServicePrice { Description = "Ironing", PriceRatio = 0.5F },
-                    new ServicePrice { Description = "Bathroom Cleaning", PriceRatio = 0.80F },
-                    new ServicePrice { Description = "Kitchen Cleaning", PriceRatio = 0.90F }
+                    new ServicePrice { Description = "Mycie okien", PriceRatio = 2.0F },
+                    new ServicePrice { Description = "Odkurzanie i mycie podłóg", PriceRatio = 1.8F },
+                    new ServicePrice { Description = "Ścieranie kurzy", PriceRatio = 1.2F },
+                    new ServicePrice { Description = "Zmywanie naczyń", PriceRatio = 0.4F },
+                    new ServicePrice { Description = "Pranie", PriceRatio = 0.3F },
+                    new ServicePrice { Description = "Prasowanie", PriceRatio = 0.5F },
+                    new ServicePrice { Description = "Czyszczenie łazienki", PriceRatio = 0.80F },
+                    new ServicePrice { Description = "Czyszczenie kuchni", PriceRatio = 0.90F }
                 };
             }
         }

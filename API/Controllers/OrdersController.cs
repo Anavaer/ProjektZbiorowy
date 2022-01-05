@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    // TODO: Add Authorize attributes according to Roles
     [ApiController]
     [Route("api/[controller]")]
     public class OrdersController : ControllerBase
@@ -76,7 +75,7 @@ namespace API.Controllers
                                                                 .ToOrderDescriptionsDto());
             }
 
-            return BadRequest("No orders found.");
+            return BadRequest("Nie znaleziono żadnych zamówień.");
         }
 
         [HttpGet("{id}")]
@@ -89,7 +88,7 @@ namespace API.Controllers
                                                              .Include(x => x.Client)
                                                              .Include(x => x.ServicePrices));
             if (order == null)
-                return BadRequest("Order not found.");
+                return BadRequest("Zamówienie nie istnieje.");
 
             var currentUserId = User.GetId();
 
@@ -113,7 +112,7 @@ namespace API.Controllers
                 return Ok(order.ToOrderDescriptionDto());
             }
 
-            return BadRequest($"No permissions to get order of id {id}");
+            return BadRequest($"Brak uprawnień, aby wyświetlić zamówienie {id}");
         }
 
         [HttpPost("create")]
@@ -123,7 +122,7 @@ namespace API.Controllers
             var services = await servicesRepo.GetAll(service => orderDto.ServicePriceIds.Contains(service.Id));
             if (services.Count() < 1)
             {
-                return BadRequest("All selected services are invalid.");
+                return BadRequest("Wszystkie podane usługi są nieprawidłowe.");
             }
 
             var client = await usersRepo.Get(u => u.Id == User.GetId());
@@ -146,7 +145,7 @@ namespace API.Controllers
                 });
             }
 
-            return await SaveAndReturnActionResult("Error has occurred when creating order.");
+            return await SaveAndReturnActionResult("Wystąpił błąd podczas tworzenia zamówienia.");
         }
 
         [HttpPut("assign/{id}")]
@@ -158,15 +157,15 @@ namespace API.Controllers
                                                              .Include(s => s.Employee));
             if (order == null)
             {
-                return BadRequest("Invalid OrderId.");
+                return BadRequest("Nieprawidłowe Id zamówienia.");
             }
             if (order.OrderStatus.Description != "NEW")
             {
-                return BadRequest("Only orders in status 'NEW' can be assigned.");
+                return BadRequest("Tylko zamowienia o statusie 'NEW' mogą być przypisane.");
             }
             if (order.ClientId == employeeId)
             {
-                return BadRequest("Order's client cannot be assigned as a worker.");
+                return BadRequest("Zamawiający nie może zostać przypisany jako pracownik.");
             }
 
             if (User.IsInRole("Administrator"))
@@ -177,7 +176,7 @@ namespace API.Controllers
 
                 if (employee == null || employee.UserRoles.FirstOrDefault(r => r.Role.Name == "Worker") == null)
                 {
-                    return BadRequest("Invalid EmployeeId.");
+                    return BadRequest("Nieprawidłowe Id pracownika.");
                 }
 
                 order.Employee = employee;
@@ -187,7 +186,7 @@ namespace API.Controllers
                 var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
                 if (order.ClientId == currentUser.Id)
                 {
-                    return BadRequest("Order's client cannot be assigned as a worker.");
+                    return BadRequest("Zamawiający nie może zostać przypisany jako pracownik.");
                 }
 
                 order.Employee = currentUser;
@@ -195,7 +194,7 @@ namespace API.Controllers
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "CONFIRMED");
 
-            return await SaveAndReturnActionResult("Error has occurred when changing status to CONFIRMED.");
+            return await SaveAndReturnActionResult("Wystąpił błąd podczas potwierdzania zamówienia.");
         }
 
         [HttpPut("cancel/{id}")]
@@ -206,23 +205,23 @@ namespace API.Controllers
                                              includes: o => o.Include(s => s.OrderStatus));
             if (order == null)
             {
-                return BadRequest("Invalid OrderId.");
+                return BadRequest("Nieprawidłowe Id zamówienia.");
             }
             if (!(order.OrderStatus.Description == "NEW" || order.OrderStatus.Description == "CONFIRMED"))
             {
-                return BadRequest("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.");
+                return BadRequest("Tylko zamowienia o statusie 'NEW' lub 'CONFIRMED' mogą być anulowwane.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
 
             if (order.ClientId != currentUser.Id)
             {
-                return BadRequest("Order can be cancelled only by the client.");
+                return BadRequest("Zamówienie może być anulowane tylko przez zamawiającego klienta.");
             }
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "CANCELLED");
 
-            return await SaveAndReturnActionResult("Error has occurred when changing status to CANCELLED.");
+            return await SaveAndReturnActionResult("Wystąpił błąd podczas anulowania zamówienia.");
         }
 
         [HttpPut("start/{id}")]
@@ -234,23 +233,23 @@ namespace API.Controllers
                                                              .Include(s => s.Employee));
             if (order == null)
             {
-                return BadRequest("Invalid OrderId.");
+                return BadRequest("Nieprawidłowe Id zamówienia.");
             }
             if (order.OrderStatus.Description != "CONFIRMED")
             {
-                return BadRequest("Only orders in status 'CONFIRMED' can be started.");
+                return BadRequest("Tylko zamowienia o statusie 'CONFIRMED' mogą być rozpoczęte.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
 
             if (order.EmployeeId != currentUser.Id)
             {
-                return BadRequest("Order can be started only by assigned employee.");
+                return BadRequest("Zamówienie może być rozpoczęte tylko przez przypisanego pracownika.");
             }
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "ONGOING");
 
-            return await SaveAndReturnActionResult("Error has occurred when changing status to ONGOING.");
+            return await SaveAndReturnActionResult("Wystąpił błąd podczas rozpoczynania zamówienia.");
         }
 
         [HttpPut("complete/{id}")]
@@ -262,23 +261,23 @@ namespace API.Controllers
                                                              .Include(s => s.Employee));
             if (order == null)
             {
-                return BadRequest("Invalid OrderId.");
+                return BadRequest("Nieprawidłowe Id zamówienia.");
             }
             if (order.OrderStatus.Description != "ONGOING")
             {
-                return BadRequest("Only orders in status 'ONGOING' can be started.");
+                return BadRequest("Tylko zamowienia o statusie 'ONGOING' mogą być zakończone.");
             }
 
             var currentUser = await usersRepo.Get(u => u.Id == User.GetId());
 
             if (order.EmployeeId != currentUser.Id)
             {
-                return BadRequest("Order can be completed only by assigned employee.");
+                return BadRequest("Zamówienie może być zakończone tylko przez przypisanego pracownika.");
             }
 
             order.OrderStatus = await statusesRepo.Get(s => s.Description == "COMPLETED");
 
-            return await SaveAndReturnActionResult("Error has occurred when changing status to COMPLETED.");
+            return await SaveAndReturnActionResult("Wystąpił błąd podczas zakończania zamówienia.");
         }
 
 

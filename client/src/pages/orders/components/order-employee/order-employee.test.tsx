@@ -109,7 +109,7 @@ describe("OrderEmployeeTest", () => {
   test("For admin menu should display two items", async () => {
     Object.defineProperty(document, "cookie", {
       writable: true,
-      value: `token=test-token; role=["Client", "Worker", "Admin"]`
+      value: `token=test-token; role=["Client", "Worker", "Administrator"]`
     });
 
     render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);
@@ -152,7 +152,7 @@ describe("OrderEmployeeTest", () => {
   test("When admin is logged in, admin is owner and employee is unassigned, menu should not be displayed", async () => {
     Object.defineProperty(document, "cookie", {
       writable: true,
-      value: `token=test-token; role=["Client", "Worker", "Admin"]; id=${mockUserList[0].id}`
+      value: `token=test-token; role=["Client", "Worker", "Administrator"]; id=${mockUserList[0].id}`
     });
 
     render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);
@@ -190,7 +190,7 @@ describe("OrderEmployeeTest", () => {
   test("After clicking second item, it should open dialog with employee list", async () => {
     Object.defineProperty(document, "cookie", {
       writable: true,
-      value: `token=test-token; role=["Client", "Worker", "Admin"]`
+      value: `token=test-token; role=["Client", "Worker", "Administrator"]`
     });
 
     render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);
@@ -214,7 +214,7 @@ describe("OrderEmployeeTest", () => {
   test("After clicking item in employee list dialog, it should assign employee", async () => {
     Object.defineProperty(document, "cookie", {
       writable: true,
-      value: `token=test-token; role=["Client", "Worker", "Admin"]`
+      value: `token=test-token; role=["Client", "Worker", "Administrator"]`
     });
 
     const { rerender } = render(<OrderEmployee onChangeAssignment={onChangeAssignment} client={mockUserList[0]} />);

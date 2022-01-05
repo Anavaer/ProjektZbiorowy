@@ -164,7 +164,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 1, "description": "NEW" },
       userId: mockOrderItem.client.id,
       employee: null,
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: [
         { "orderStatusId": 5, "description": "CANCELED" }
       ]
@@ -173,7 +173,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 2, "description": "CONFIRMED" },
       userId: mockOrderItem.client.id,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: [
         { "orderStatusId": 5, "description": "CANCELED" }
       ]
@@ -182,14 +182,14 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 3, "description": "ONGOING" },
       userId: mockOrderItem.client.id,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: []
     },
     {
       status: { "orderStatusId": 4, "description": "COMPLETED" },
       userId: mockOrderItem.client.id,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: []
     },
     // Logged user is worker and user is not order owner
@@ -232,7 +232,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 1, "description": "NEW" },
       userId: mockOrderItem.client.id + 1,
       employee: null,
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: [
         { "orderStatusId": 2, "description": "CONFIRMED" }
       ]
@@ -241,7 +241,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 2, "description": "CONFIRMED" },
       userId: mockOrderItem.client.id + 1,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: [
         { "orderStatusId": 3, "description": "ONGOING" }
       ]
@@ -250,7 +250,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 3, "description": "ONGOING" },
       userId: mockOrderItem.client.id + 1,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: [
         { "orderStatusId": 4, "description": "COMPLETED" }
       ]
@@ -259,7 +259,7 @@ describe("OrderStatusWidgetTest", () => {
       status: { "orderStatusId": 4, "description": "COMPLETED" },
       userId: mockOrderItem.client.id + 1,
       employee: mockUserList[0],
-      roles: ["Client", "Worker", "Admin"],
+      roles: ["Client", "Worker", "Administrator"],
       fields: []
     }
   ]

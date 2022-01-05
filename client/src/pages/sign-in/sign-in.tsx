@@ -30,9 +30,12 @@ export function SignIn() {
       const date = new Date()
       date.setTime(date.getTime() + (TOKEN_LIFE * 24 * 60 * 60 * 1000))
 
+      let parsedToken: any = JSON.parse(atob(data.token.split('.')[1]));
+
       setCookie('username', data.username, { expires: date })
       setCookie('token', data.token, { expires: date })
-      setCookie('role', JSON.parse(atob(data.token.split('.')[1])).role);
+      setCookie('role', parsedToken.role);
+      setCookie('id', parsedToken.nameid);
       navigate('/')
     });
   };

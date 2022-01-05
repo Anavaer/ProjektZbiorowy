@@ -123,24 +123,25 @@ export function OrderList() {
   }
 
   const closeCreateOrderModal = (approved: boolean = false): void => {
-    [
-      { fieldName: "city", value: createdOrder.city},
-      { fieldName: "address", value: createdOrder.address},
-      { fieldName: "area", value: createdOrder.area},
-      { fieldName: "serviceDate", value: selectedServiceDate},
-      { fieldName: "serviceDates", value: createdOrder.serviceDates},
-      { fieldName: "servicePrices", value: createdOrder.servicePriceIds}
-    ]
-    .forEach(x => {
-      orderListAddNewOrderValidatorFactory.run(x.fieldName, x.value);
-      let newOrderListAddNewOrderValidatorFactory = Object.assign({}, orderListAddNewOrderValidatorFactory);
-      setOrderListAddNewOrderValidatorFactory(newOrderListAddNewOrderValidatorFactory);
-    });
-
-    if (!orderListAddNewOrderValidatorFactory.hasAnyError()) {
+    if (!approved) {
       setCreateOrderModalOpened(false);
+    }
+    else {
+      [
+        { fieldName: "city", value: createdOrder.city },
+        { fieldName: "address", value: createdOrder.address },
+        { fieldName: "area", value: createdOrder.area },
+        { fieldName: "serviceDate", value: selectedServiceDate },
+        { fieldName: "serviceDates", value: createdOrder.serviceDates },
+        { fieldName: "servicePrices", value: createdOrder.servicePriceIds }
+      ]
+        .forEach(x => {
+          orderListAddNewOrderValidatorFactory.run(x.fieldName, x.value);
+          let newOrderListAddNewOrderValidatorFactory = Object.assign({}, orderListAddNewOrderValidatorFactory);
+          setOrderListAddNewOrderValidatorFactory(newOrderListAddNewOrderValidatorFactory);
+        });
 
-      if (approved) {
+      if (!orderListAddNewOrderValidatorFactory.hasAnyError()) {
         orderService.createOrder(createdOrder)
           .then(() => {
             orderService.getOrders().then(res => {
@@ -148,6 +149,7 @@ export function OrderList() {
               setOrders(res);
             });
           })
+          .then(() => setCreateOrderModalOpened(false))
           .then(() => {
             setCustomSnackbarOptions({
               opened: true,

@@ -183,8 +183,7 @@ export function OrderDetails() {
                 </List>
               </Box>
               <OrderStatusWidget 
-                value={order?.orderStatus}
-                completed={OrderUtils.isCompleted(order)}
+                order={order!}
                 callbackBuilder={orderStatusStateChangeCallbackBuilder} 
               />
             </Card>

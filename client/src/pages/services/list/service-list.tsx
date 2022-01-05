@@ -55,7 +55,7 @@ export const ServiceList = () => {
     if (cookies.token && cookies.role && cookies.role.includes("Administrator")) {
       adminService.getServices().then(res => setServices(res));
     } else {
-      navigate("/");
+      navigate("/sign-in");
     }
   }, []);
 

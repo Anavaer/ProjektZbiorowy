@@ -142,7 +142,7 @@ namespace API.Controllers
             }
 
             service.Description = serviceDto.Description;
-            service.PriceRatio = service.PriceRatio;
+            service.PriceRatio = serviceDto.PriceRatio;
 
             await this.servicesRepo.Update(service);
 

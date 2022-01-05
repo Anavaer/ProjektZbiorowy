@@ -30,12 +30,12 @@ export class AdminService {
   }
 
   public editService(serviceId: Number, description: String, priceRatio: Number): Promise<any> {
-    return axios.put(`/api/admin/edit-service/${serviceId}`, { description, priceRatio, unitPrice: priceRatio }, this.authUtils.includeAuthorization())
+    return axios.put(`/api/admin/edit-service/${serviceId}`, { description, priceRatio }, this.authUtils.includeAuthorization())
       .then(res => res.data);
   }
 
   public createService({description, priceRatio }: {description: String, priceRatio: Number}): Promise<any> {
-    return axios.post(`/api/admin/add-service`, { description, priceRatio, unitPrice: priceRatio }, this.authUtils.includeAuthorization())
+    return axios.post(`/api/admin/add-service`, { description, priceRatio }, this.authUtils.includeAuthorization())
       .then(res => res.data);
   }
 }

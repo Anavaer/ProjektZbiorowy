@@ -84,7 +84,7 @@ export function OrderDetails() {
     if (cookies.token)
       loadOrderDetails();
     else
-      navigate("/");
+      navigate("/sign-in");
   }, []);
 
 

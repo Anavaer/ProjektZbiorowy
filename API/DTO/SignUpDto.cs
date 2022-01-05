@@ -4,10 +4,10 @@ namespace API.DTO
 {
     public class SignUpDto
     {
-        [Required]
+        [Required(ErrorMessage = "Nazwa użytkownika jest wymagana.")]
         public string Username { get; set; }
-        [Required]
-        [MinLength(8)]
+        [Required(ErrorMessage = "Hasło jest wymagane.")]
+        [MinLength(8, ErrorMessage = "Minimalna długość hasła to 8 znaków.")]
         public string Password { get; set; }
 
         public string CompanyName { get; set; }

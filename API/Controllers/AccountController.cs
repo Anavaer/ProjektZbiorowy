@@ -27,7 +27,7 @@ namespace API.Controllers
         {
             if (await this.userManager.FindByNameAsync(signUpDto.Username) != null)
             {
-                return BadRequest("This username is already taken.");
+                return BadRequest("Wybrana nazwa użytkownika jest zajęta.");
             }
 
             var user = new User
@@ -56,7 +56,8 @@ namespace API.Controllers
             return Ok(new IdentityDto
             {
                 Username = user.UserName,
-                Token = await this.jwtTokenService.NewJwtToken(user)
+                Token = await this.jwtTokenService.NewJwtToken(user),
+                Id = user.Id
             });
         }
 
@@ -67,18 +68,19 @@ namespace API.Controllers
 
             if (user == null)
             {
-                return Unauthorized("User with this username does not exist.");
+                return Unauthorized("Użytkownik o wybranej nazwie nie istnieje.");
             }
 
             if (!(await this.signInManager.CheckPasswordSignInAsync(user, signInDto.Password, lockoutOnFailure: false)).Succeeded)
             {
-                return Unauthorized("Invalid password has been entered.");
+                return Unauthorized("Nieprawidłowe hasło.");
             }
 
             return Ok(new IdentityDto
             {
                 Username = user.UserName,
-                Token = await this.jwtTokenService.NewJwtToken(user)
+                Token = await this.jwtTokenService.NewJwtToken(user),
+                Id = user.Id
             });
         }
     }

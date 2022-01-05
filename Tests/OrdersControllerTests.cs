@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -40,7 +39,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("All selected services are invalid.", result.Value);
+            Assert.AreEqual("Wszystkie wybrane usługi są nieprawidłowe.", result.Value);
         }
 
         [Test]
@@ -75,7 +74,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Error has occurred when creating order.", result.Value);
+            Assert.AreEqual("Wystąpił błąd podczas tworzenia zamówienia.", result.Value);
         }
 
         [Test]
@@ -100,7 +99,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Only orders in status 'NEW' or 'CONFIRMED' can be cancelled.", result.Value);
+            Assert.AreEqual("Tylko nowe i potwierdzone zamowienia mogą być anulowane.", result.Value);
         }
 
         [Test]
@@ -129,7 +128,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Order can be cancelled only by the client.", result.Value);
+            Assert.AreEqual("Zamówienie może być anulowane tylko przez zamawiającego.", result.Value);
         }
 
         [Test]
@@ -189,7 +188,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Only orders in status 'CONFIRMED' can be started.", result.Value);
+            Assert.AreEqual("Tylko potwierdzone zamówienia mogą być rozpoczęte.", result.Value);
         }
 
         [Test]
@@ -214,7 +213,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Only orders in status 'ONGOING' can be started.", result.Value);
+            Assert.AreEqual("Tylko rozpoczęte zamówienia mogą być zakończone.", result.Value);
         }
 
         [Test]
@@ -239,7 +238,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Only orders in status 'NEW' can be assigned.", result.Value);
+            Assert.AreEqual("Tylko nowe zamowienia mogą być przypisane.", result.Value);
         }
 
         [Test]
@@ -268,7 +267,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Order can be started only by assigned employee.", result.Value);
+            Assert.AreEqual("Zamówienie może być rozpoczęte tylko przez przypisanego pracownika.", result.Value);
         }
 
         [Test]
@@ -293,7 +292,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Order's client cannot be assigned as a worker.", result.Value);
+            Assert.AreEqual("Zamawiający nie może zostać przypisany jako pracownik.", result.Value);
         }
 
         [Test]
@@ -402,7 +401,7 @@ namespace Tests
 
             // Assert
             Assert.AreEqual((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.AreEqual("Order can be completed only by assigned employee.", result.Value);
+            Assert.AreEqual("Zamówienie może być zakończone tylko przez przypisanego pracownika.", result.Value);
         }
 
         [Test]

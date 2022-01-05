@@ -4,5 +4,6 @@ export class UserRoleUtils {
   public static isWorker = (roles?: string[]): boolean => 
     UserRoleUtils.isClient(roles) && (roles ?? []).includes("Worker");
 
-  public static isAdmin = (roles?: string[]): boolean => UserRoleUtils.isWorker(roles) && (roles ?? []).includes("Administrator");
+  public static isAdmin = (roles?: string[]): boolean => 
+    UserRoleUtils.isWorker(roles) && (roles ?? []).includes("Administrator");
 }

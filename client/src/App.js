@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import './App.css';
-import { Home, SignIn, SignUp, OrderList, OrderDetails } from 'pages';
+import {Home, SignIn, SignUp, OrderList, OrderDetails, ServiceList, UsersList} from 'pages';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -13,11 +13,14 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
+import { UserRoleUtils } from 'utils/user-role-utils';
 
 const theme = createTheme();
 
 function App() {
-  const [cookies, setCookie, removeCookie] = useCookies(['username', 'token']);
+  const [cookies, setCookie, removeCookie] = useCookies(['username', 'token', 'role']);
   const isLoggedIn = cookies.username && cookies.token;
 
   const navigate = useNavigate();
@@ -39,12 +42,14 @@ function App() {
           </Typography>
           {
             isLoggedIn ? ([
-              <Button color='inherit' startIcon={<ShoppingCartIcon />}><Link to='orders'>Zamówienia</Link></Button>,
+              <Button color='inherit' onClick={() => navigate('/orders')} startIcon={<ShoppingCartIcon />}>Zamówienia</Button>,
+              UserRoleUtils.isAdmin(cookies.role) && <Button color='inherit' onClick={() => navigate('/services')} startIcon={<HomeRepairServiceIcon />}>Usługi</Button>,
+              UserRoleUtils.isAdmin(cookies.role) && <Button color='inherit' onClick={() => navigate('/users')} startIcon={<SupervisedUserCircleIcon />}>Użytkownicy</Button>,
               <Button color='inherit' startIcon={<AccountCircleIcon />}>{cookies.username}</Button>,
               <Button color='inherit' startIcon={<LogoutIcon />} onClick={logOut}>Wyloguj</Button>
             ]) : ([
-              <Button color='inherit' startIcon={<LoginIcon />}><Link to='sign-in'>Zaloguj</Link></Button>,
-              <Button color='inherit' startIcon={<PersonAddAltIcon />}><Link to='sign-up'>Zarejestruj</Link></Button>
+              <Button color='inherit' onClick={() => navigate('/sign-in')} startIcon={<LoginIcon />}>Zaloguj</Button>,
+              <Button color='inherit' onClick={() => navigate('/sign-up')} startIcon={<PersonAddAltIcon />}>Zarejestruj</Button>
             ])
           }
 
@@ -56,6 +61,8 @@ function App() {
         <Route path='sign-up' element={<SignUp />}/>
         <Route path='orders' element={<OrderList />} />
         <Route path='orders/:id' element={<OrderDetails />} />
+        <Route path='services' element={<ServiceList />} />
+        <Route path='users' element={<UsersList />} />
       </Routes>
     </ThemeProvider>
   );

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SignIn renders correctly 1`] = `
+exports[`SignIn tests SignIn renders correctly 1`] = `
 <div>
   <main
     className="MuiContainer-root MuiContainer-maxWidthXs css-nzinn5-MuiContainer-root"

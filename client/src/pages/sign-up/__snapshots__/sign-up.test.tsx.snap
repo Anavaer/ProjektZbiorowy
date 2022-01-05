@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SignUp renders correctly 1`] = `
+exports[`SignUp tests SignUp renders correctly 1`] = `
 <main
   className="MuiContainer-root MuiContainer-maxWidthXs css-nzinn5-MuiContainer-root"
 >

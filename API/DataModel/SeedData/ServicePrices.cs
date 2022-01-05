@@ -12,7 +12,7 @@ namespace API.DataModel.SeedData
                 return new List<ServicePrice>
                 {
                     new ServicePrice { Description = "Mycie okien", PriceRatio = 2.0F },
-                    new ServicePrice { Description = "Podłogi", PriceRatio = 1.8F },
+                    new ServicePrice { Description = "Odkurzanie i mycie podłóg", PriceRatio = 1.8F },
                     new ServicePrice { Description = "Ścieranie kurzy", PriceRatio = 1.2F },
                     new ServicePrice { Description = "Zmywanie naczyń", PriceRatio = 0.4F },
                     new ServicePrice { Description = "Pranie", PriceRatio = 0.3F },

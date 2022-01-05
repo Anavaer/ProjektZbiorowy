@@ -12,12 +12,13 @@ export function OrderEmployee(props: OrderEmployeeProps) {
   const { employee, client, onChangeAssignment } = props;
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>();
-  const [cookies, setCookie, removeCookie] = useCookies(["token", "role"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["token", "role", "id"]);
   const [dialogOpened, setDialogOpened] = React.useState(false);
   const [users, setUsers] = React.useState<User[]>([]);
 
   const optionsOpened: boolean = Boolean(anchorEl);
   const adminService: AdminService = new AdminService(cookies);
+  const workerAbleToClick: boolean = Boolean(UserRoleUtils.isWorker(cookies.role) && client?.id != cookies.id);
 
 
 
@@ -43,10 +44,10 @@ export function OrderEmployee(props: OrderEmployeeProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              cursor: (UserRoleUtils.isWorker(cookies.role) ? 'pointer' : 'inherit')
+              cursor: (workerAbleToClick ? 'pointer' : 'inherit')
             }}
             role="unassigned-employee-box"
-            onClick={event => UserRoleUtils.isWorker(cookies.role) && setAnchorEl(event.currentTarget)}
+            onClick={event => workerAbleToClick && setAnchorEl(event.currentTarget)}
             aria-controls="order-employee-menu">
             <Typography variant="body2" sx={{ fontStyle: 'oblique' }}>Nieprzypisany</Typography>
             <Avatar sx={{ bgcolor: grey[500], marginLeft: '10px' }} role="employee-avatar"></Avatar>
@@ -60,7 +61,7 @@ export function OrderEmployee(props: OrderEmployeeProps) {
             open={optionsOpened}
             onClose={() => setAnchorEl(null)}
           >
-            {UserRoleUtils.isWorker(cookies.role) && (
+            {workerAbleToClick && (
               <MenuItem onClick={() => onChangeAssignment()} role="employee-assign-to-me-menu-item">
                 <PersonAddAltIcon sx={{ marginRight: '10px' }} />
                 Przypisz do mnie

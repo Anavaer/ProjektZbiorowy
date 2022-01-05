@@ -100,7 +100,7 @@ namespace API.Controllers
             if (User.IsInRole("Worker"))
             {
                 if (order.EmployeeId == currentUserId
-                    || (order.EmployeeId == null && order.OrderStatus.OrderStatusId == 2)
+                    || (order.EmployeeId == null && order.OrderStatus.OrderStatusId == 1)
                     || order.ClientId == currentUserId)
                 {
                     return Ok(order.ToOrderDescriptionDto());

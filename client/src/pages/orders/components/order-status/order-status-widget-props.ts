@@ -1,9 +1,8 @@
-import { OrderStatus } from "types";
+import { Order } from "types";
 import { OrderStatusStateChangeCallbackBuilder } from "./OrderStatusStateChangeCallbackBuilder";
 
 
 export interface OrderStatusWidgetProps {
-  value?: OrderStatus;
-  completed: boolean;
+  order?: Order;
   callbackBuilder: OrderStatusStateChangeCallbackBuilder;
 }

@@ -6,6 +6,7 @@ import { useCookies } from 'react-cookie';
 import { OrderStatusService } from 'services/order/status/order-status-service';
 import { OrderStatus } from "types";
 import { OrderUtils } from "utils/order-utils";
+import { UserRoleUtils } from "utils/user-role-utils";
 import { OrderStatusWidgetColorsOptions } from "./order-status-widget-colors-props";
 import { OrderStatusWidgetProps } from "./order-status-widget-props";
 
@@ -16,24 +17,42 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
   const [statusColors, setStatusColors] = React.useState<OrderStatusWidgetColorsOptions>();
   const [statusList, setStatusList] = React.useState<OrderStatus[]>([]);
 
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["token", "role", "id"]);
 
   const orderStatusService: OrderStatusService = new OrderStatusService(cookies);
 
 
 
   React.useEffect(() => {
-    if (props.value) {
-      orderStatusService.getAllOrderStatuses().then(res => setStatusList(res));
-      setStatusColors(OrderUtils.getOrderStatusColor(props.value.description));
+    if (props.order?.orderStatus) {
+      orderStatusService.getAllOrderStatuses()
+        .then(res => OrderUtils.isCompleted(props.order) ? [] : res)
+        .then(res => {
+          return res.filter(x =>
+            (
+              UserRoleUtils.isClient(cookies.role) && 
+              x.description == "CANCELED" && 
+              cookies.id == props.order?.client.id &&
+              ["NEW", "CONFIRMED"].includes(props.order?.orderStatus.description!)
+            ) 
+            ||
+            (
+              cookies.id != props.order?.client.id && 
+              (props.order?.employee == null ? true : (cookies.id == props.order?.employee.id || UserRoleUtils.isWorker(cookies.role))) &&
+              x.orderStatusId == props.order?.orderStatus.orderStatusId! + 1
+            )
+          );
+        })
+        .then(res => setStatusList(res));
+      setStatusColors(OrderUtils.getOrderStatusColor(props.order?.orderStatus.description));
     }
-  }, [props.value]);
+  }, [props.order?.orderStatus]);
 
 
 
 
   const openOrderStatusMenu = (evt: React.MouseEvent<HTMLElement>): void => {
-    if (!props.completed) {
+    if (statusList.length != 0) {
       setMenuOpened(true);
       setLoading(false);
       setAnchorEl(evt.currentTarget);
@@ -65,23 +84,23 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
             size="large"
             endIcon={<ExpandMoreIcon />}
             onClick={openOrderStatusMenu}
-            disableRipple={props.completed}
+            disableRipple={statusList.length == 0}
             disabled={loading}
             sx={{
               ...statusColors,
               fontWeight: 'bold',
-              cursor: !props.completed ? 'pointer' : 'default',
+              cursor: statusList.length != 0 ? 'pointer' : 'default',
               ':hover': {
-                'bgcolor': !props.completed ? statusColors?.backgroundDark : statusColors?.background,
-                boxShadow: !props.completed ? 'button.shadow' : 'none'
+                'bgcolor': statusList.length != 0 ? statusColors?.backgroundDark : statusColors?.background,
+                boxShadow: statusList.length != 0 ? 'button.shadow' : 'none'
               },
               ':active': {
-                boxShadow: !props.completed ? 'button.shadow' : 'none'
+                boxShadow: statusList.length != 0 ? 'button.shadow' : 'none'
               },
-              boxShadow: !props.completed ? 'button.shadow' : 'none'
+              boxShadow: statusList.length != 0 ? 'button.shadow' : 'none'
             }}
           >
-            {props.value?.description}
+            {props.order?.orderStatus.description}
           </Button>
           {loading && (
             <CircularProgress
@@ -113,8 +132,7 @@ export function OrderStatusWidget(props: OrderStatusWidgetProps) {
           }
         }}
       >
-        {statusList.filter(x => x.description == "CANCELED" || x.orderStatusId == (props.value?.orderStatusId ?? 1) + 1)
-          .map(status => {
+        {statusList.map(status => {
             let colors = OrderUtils.getOrderStatusColor(status.description);
             return (
               <MenuItem

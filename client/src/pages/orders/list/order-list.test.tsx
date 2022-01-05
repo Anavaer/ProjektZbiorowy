@@ -84,7 +84,7 @@ describe("OrderListTest", () => {
 
 
 
-  test("For missing tokem it should redirect to main page", async () => {
+  test("For missing token it should redirect to main page", async () => {
     render(
       <MemoryRouter initialEntries={["/orders"]}>
         <Routes>

@@ -35,7 +35,7 @@ export function SignIn() {
       setCookie('username', data.username, { expires: date })
       setCookie('token', data.token, { expires: date })
       setCookie('role', parsedToken.role);
-      setCookie('id', parsedToken.id);
+      setCookie('id', parsedToken.nameid);
       navigate('/')
     });
   };

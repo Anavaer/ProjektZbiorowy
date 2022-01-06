@@ -17,10 +17,10 @@ import { AdminService } from 'services/admin/admin-service';
 import { OrderService } from 'services/order/order-service';
 import { Order, ServicePrice } from 'types';
 import { OrderDTO } from 'types/order/OrderDTO';
+import { RequiredValidator } from 'utils/validator/RequiredValidator';
+import { ValidatorFactory } from 'utils/validator/ValidatorFactory';
 import { CustomSnackbarOptions } from '../../../utils/CustomSnackbarOptions';
 import { OrderItem } from '../components/order-item/order-item';
-import { OrderListAddNewOrderValidatorFactory } from './validation/OrderListAddNewOrderValidatorFactory';
-import { RequiredOrderListAddNewOrderValidator } from './validation/RequiredOrderListAddNewOrderValidator';
 
 
 
@@ -34,16 +34,16 @@ export function OrderList() {
   const [servicePrices, setServicePrices] = React.useState<ServicePrice[]>([]);
   const [createdOrder, setCreatedOrder] = React.useState<OrderDTO>({serviceDates: [], city: "", address: "", area: 0, servicePriceIds: []});
   const [addServiceDateDisabled, setAddServiceDateDisabled] = React.useState(false);
-  const [orderListAddNewOrderValidatorFactory, setOrderListAddNewOrderValidatorFactory] = React.useState(new OrderListAddNewOrderValidatorFactory()
-    .addValidator(new RequiredOrderListAddNewOrderValidator("city"))
-    .addValidator(new RequiredOrderListAddNewOrderValidator("address"))
-    .addValidator(new RequiredOrderListAddNewOrderValidator("area"))
+  const [validatorFactory, setValidatorFactory] = React.useState(new ValidatorFactory()
+    .addValidator(new RequiredValidator("city"))
+    .addValidator(new RequiredValidator("address"))
+    .addValidator(new RequiredValidator("area"))
     .addValidator({
       fieldName: "area",
       errorMessage: "Wartość musi być większa od zera",
       validatorFn: (value: any) => parseFloat(value) > 0
     })
-    .addValidator(new RequiredOrderListAddNewOrderValidator("serviceDate"))
+    .addValidator(new RequiredValidator("serviceDate"))
     .addValidator({
       fieldName: "serviceDate",
       errorMessage: "Wprowadzona data jest nieprawidłowa",
@@ -136,12 +136,12 @@ export function OrderList() {
         { fieldName: "servicePrices", value: createdOrder.servicePriceIds }
       ]
         .forEach(x => {
-          orderListAddNewOrderValidatorFactory.run(x.fieldName, x.value);
-          let newOrderListAddNewOrderValidatorFactory = Object.assign({}, orderListAddNewOrderValidatorFactory);
-          setOrderListAddNewOrderValidatorFactory(newOrderListAddNewOrderValidatorFactory);
+          validatorFactory.run(x.fieldName, x.value);
+          let newOrderListAddNewOrderValidatorFactory = Object.assign({}, validatorFactory);
+          setValidatorFactory(newOrderListAddNewOrderValidatorFactory);
         });
 
-      if (!orderListAddNewOrderValidatorFactory.hasAnyError()) {
+      if (!validatorFactory.hasAnyError()) {
         orderService.createOrder(createdOrder)
           .then(() => {
             orderService.getOrders().then(res => {
@@ -173,8 +173,8 @@ export function OrderList() {
   const handleInputChange = (fieldName: string, value: any): void => {
     setCreatedOrder({ ...createdOrder, [fieldName]: value });
 
-    orderListAddNewOrderValidatorFactory.run(fieldName, value);
-    setOrderListAddNewOrderValidatorFactory(orderListAddNewOrderValidatorFactory);
+    validatorFactory.run(fieldName, value);
+    setValidatorFactory(validatorFactory);
   }
 
 
@@ -183,9 +183,9 @@ export function OrderList() {
     setSelectedServiceDate(selectedValue);
     setAddServiceDateDisabled(createdOrder.serviceDates.includes(moment(selectedValue).toISOString()));
 
-    orderListAddNewOrderValidatorFactory.run("serviceDate", selectedValue);
-    orderListAddNewOrderValidatorFactory.run("serviceDates", createdOrder.serviceDates);
-    setOrderListAddNewOrderValidatorFactory(orderListAddNewOrderValidatorFactory);
+    validatorFactory.run("serviceDate", selectedValue);
+    validatorFactory.run("serviceDates", createdOrder.serviceDates);
+    setValidatorFactory(validatorFactory);
   }
 
 
@@ -194,9 +194,9 @@ export function OrderList() {
     setCreatedOrder(newCreatedOrder);
     setAddServiceDateDisabled(newCreatedOrder.serviceDates.includes(moment(selectedServiceDate).toISOString()));
 
-    orderListAddNewOrderValidatorFactory.run("serviceDate", selectedServiceDate);
-    orderListAddNewOrderValidatorFactory.run("serviceDates", newCreatedOrder.serviceDates);
-    setOrderListAddNewOrderValidatorFactory(orderListAddNewOrderValidatorFactory);
+    validatorFactory.run("serviceDate", selectedServiceDate);
+    validatorFactory.run("serviceDates", newCreatedOrder.serviceDates);
+    setValidatorFactory(validatorFactory);
   }
 
   const removeServiceDateFromOrder = (date: string): void => {
@@ -214,8 +214,8 @@ export function OrderList() {
     
     setCreatedOrder(newCreatedOrder);
 
-    orderListAddNewOrderValidatorFactory.run("servicePrices", newCreatedOrder.servicePriceIds);
-    setOrderListAddNewOrderValidatorFactory(orderListAddNewOrderValidatorFactory);
+    validatorFactory.run("servicePrices", newCreatedOrder.servicePriceIds);
+    setValidatorFactory(validatorFactory);
   }
 
   const assignOrder = (success: boolean, errorMessage?: string): void => {
@@ -295,8 +295,8 @@ export function OrderList() {
                         <Grid item xs={6}>
                           <TextField
                             role="order-list-form-field-city"
-                            error={orderListAddNewOrderValidatorFactory.hasError("city")}
-                            helperText={orderListAddNewOrderValidatorFactory.getErrorMessage("city")}
+                            error={validatorFactory.hasError("city")}
+                            helperText={validatorFactory.getErrorMessage("city")}
                             margin='normal'
                             required
                             fullWidth
@@ -309,8 +309,8 @@ export function OrderList() {
                         <Grid item xs={6}>
                           <TextField
                             role="order-list-form-field-address"
-                            error={orderListAddNewOrderValidatorFactory.hasError("address")}
-                            helperText={orderListAddNewOrderValidatorFactory.getErrorMessage("address")}
+                            error={validatorFactory.hasError("address")}
+                            helperText={validatorFactory.getErrorMessage("address")}
                             margin='normal'
                             required
                             fullWidth
@@ -323,8 +323,8 @@ export function OrderList() {
                         <Grid item xs={12}>
                           <TextField
                             role="order-list-form-field-area"
-                            error={orderListAddNewOrderValidatorFactory.hasError("area")}
-                            helperText={orderListAddNewOrderValidatorFactory.getErrorMessage("area")}
+                            error={validatorFactory.hasError("area")}
+                            helperText={validatorFactory.getErrorMessage("area")}
                             margin='normal'
                             required
                             fullWidth
@@ -365,12 +365,12 @@ export function OrderList() {
                                     name="serviceDate"
                                     id="serviceDate"
                                     helperText={
-                                      orderListAddNewOrderValidatorFactory.getErrorMessage("serviceDate") ??
-                                      orderListAddNewOrderValidatorFactory.getErrorMessage("serviceDates")
+                                      validatorFactory.getErrorMessage("serviceDate") ??
+                                      validatorFactory.getErrorMessage("serviceDates")
                                     }
                                     error={
-                                      orderListAddNewOrderValidatorFactory.hasError("serviceDate") ||
-                                      orderListAddNewOrderValidatorFactory.hasError("serviceDates")
+                                      validatorFactory.hasError("serviceDate") ||
+                                      validatorFactory.hasError("serviceDates")
                                     }
                                   />
                                 )}
@@ -392,7 +392,7 @@ export function OrderList() {
                                 size="large"
                                 startIcon={<AddIcon />}
                                 fullWidth={true}
-                                disabled={addServiceDateDisabled || orderListAddNewOrderValidatorFactory.hasError("serviceDate")}
+                                disabled={addServiceDateDisabled || validatorFactory.hasError("serviceDate")}
                                 style={addServiceDateDisabled ? { pointerEvents: 'none' } : {}}
                                 onClick={addServiceDateToOrder}>Dodaj</Button>
                             </span>
@@ -440,7 +440,7 @@ export function OrderList() {
                 variant="outlined" 
                 sx={{ 
                   height: '100%', 
-                  borderColor: orderListAddNewOrderValidatorFactory.hasError("servicePrices") ? red[500] : "card.borderColor"
+                  borderColor: validatorFactory.hasError("servicePrices") ? red[500] : "card.borderColor"
                 }}
               >
                 <CardHeader 
@@ -473,7 +473,7 @@ export function OrderList() {
                     ))}
                   </List>
                 </CardContent>
-                {orderListAddNewOrderValidatorFactory.hasError("servicePrices") && (
+                {validatorFactory.hasError("servicePrices") && (
                   <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Typography color="error" component="p" variant="subtitle2">Musisz zaznaczyć jedną z usług</Typography>
                   </CardActions>

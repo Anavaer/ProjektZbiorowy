@@ -10,7 +10,8 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText
+  ListItemText,
+  Typography
 } from "@mui/material";
 import * as React from 'react';
 import {useState} from "react";
@@ -48,8 +49,7 @@ export function ServiceItem({ service }: ServiceItemProps): JSX.Element {
                 </ListItemAvatar>
                 <ListItemText
                   role="service-item-name"
-                  primary="Nazwa Usługi"
-                  secondary={
+                  primary={
                     isEdited ?
                       <TextField
                         name="serviceName"
@@ -60,6 +60,7 @@ export function ServiceItem({ service }: ServiceItemProps): JSX.Element {
                         id="serviceName"
                       /> : serviceName
                   }
+                  secondary="Nazwa Usługi"
                 />
               </ListItem>
               <ListItem>
@@ -70,8 +71,7 @@ export function ServiceItem({ service }: ServiceItemProps): JSX.Element {
                 </ListItemAvatar>
                 <ListItemText
                   role="service-item-price-ratio"
-                  primary="Cena usługi"
-                  secondary={
+                  primary={
                     isEdited ?
                       <TextField
                         name="servicePrice"
@@ -81,8 +81,9 @@ export function ServiceItem({ service }: ServiceItemProps): JSX.Element {
                         value={priceRatio}
                         onChange={(event) => setPriceRatio(Number(event.target.value))}
                         id="servicePrice"
-                      /> : priceRatio
+                      /> : <Typography>{priceRatio.toFixed(2)}zł/m<sup>2</sup></Typography>
                   }
+                  secondary="Cena usługi"
                 />
               </ListItem>
               {

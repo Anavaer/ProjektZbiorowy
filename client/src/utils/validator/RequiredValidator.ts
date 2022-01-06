@@ -1,6 +1,6 @@
-import { OrderListAddNewOrderValidator } from "./OrderListAddNewOrderValidator";
+import { Validator } from "./Validator";
 
-export class RequiredOrderListAddNewOrderValidator implements OrderListAddNewOrderValidator {
+export class RequiredValidator implements Validator {
   fieldName: string;
   errorMessage: string;
   validatorFn: (value: string) => boolean;

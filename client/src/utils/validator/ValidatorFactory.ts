@@ -1,10 +1,10 @@
-import { OrderListAddNewOrderValidator } from "./OrderListAddNewOrderValidator";
+import { Validator } from "./Validator";
 
-export class OrderListAddNewOrderValidatorFactory {
+export class ValidatorFactory {
   private validators: any = {};
   private errors: any = {};
 
-  public addValidator(validator: OrderListAddNewOrderValidator): OrderListAddNewOrderValidatorFactory {
+  public addValidator(validator: Validator): ValidatorFactory {
     if (!this.validators[validator.fieldName]) {
       this.validators[validator.fieldName] = { validators: [validator] };
     }

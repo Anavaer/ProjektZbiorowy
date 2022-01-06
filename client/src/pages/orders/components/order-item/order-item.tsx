@@ -61,7 +61,7 @@ export function OrderItem(props : OrderItemProps) {
 
 
   return (
-    <Grid item xl={3} md={4} sm={6} xs={12} sx={{ position: 'relative' }} role="order-item">
+    <Grid item xl={3} lg={4} sm={12} xs={12} sx={{ position: 'relative' }} role="order-item">
       <Card sx={{ minWidth: 200 }}>
         <CardContent>
           <Box sx={{ 
@@ -70,7 +70,7 @@ export function OrderItem(props : OrderItemProps) {
             justifyContent: 'space-between',
           }}>
             <Paper sx={orderStateColors} role="order-item-status">
-              {order.orderStatus.description}
+              {order.orderStatus.visibleText}
             </Paper>
             <Typography 
               component="h5"

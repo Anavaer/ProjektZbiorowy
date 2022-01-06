@@ -41,7 +41,7 @@ describe("OrderStatusWidgetTest", () => {
     const colors = OrderUtils.getOrderStatusColor(mockOrderItem.orderStatus.description);
 
     expect(orderStatusWidget).toBeInTheDocument();
-    expect(orderStatusWidgetButton).toHaveTextContent(mockOrderItem.orderStatus.description);
+    expect(orderStatusWidgetButton).toHaveTextContent(mockOrderItem.orderStatus.visibleText!);
     expect(orderStatusWidgetButton).not.toBeDisabled();
     expect(orderStatusWidgetButton).toHaveStyle({
       backgroundColor: colors.background,
@@ -57,7 +57,7 @@ describe("OrderStatusWidgetTest", () => {
     });
 
     let processedOrder: Order = Object.assign({}, mockOrderItem);
-    processedOrder.orderStatus = { "orderStatusId": 1, "description": "NEW" };
+    processedOrder.orderStatus = OrderUtils.processOrderStatus({ "orderStatusId": 1, "description": "NEW" });
     processedOrder.employee = mockUserList[0];
 
     render(<OrderStatusWidget order={processedOrder} callbackBuilder={orderStatusStateChangeCallbackBuilder} />);
@@ -77,7 +77,7 @@ describe("OrderStatusWidgetTest", () => {
     });
 
     let processedOrder: Order = Object.assign({}, mockOrderItem);
-    processedOrder.orderStatus = { "orderStatusId": 4, "description": "COMPLETED" };
+    processedOrder.orderStatus = OrderUtils.processOrderStatus({ "orderStatusId": 4, "description": "COMPLETED" });
     processedOrder.employee = mockUserList[0];
 
     render(<OrderStatusWidget order={processedOrder} callbackBuilder={orderStatusStateChangeCallbackBuilder} />);
@@ -271,7 +271,7 @@ describe("OrderStatusWidgetTest", () => {
       });
 
       let processedOrder: Order = Object.assign({}, mockOrderItem);
-      processedOrder.orderStatus = entry.status;
+      processedOrder.orderStatus = OrderUtils.processOrderStatus(entry.status);
       processedOrder.employee = entry.employee!;
 
       render(
@@ -289,11 +289,13 @@ describe("OrderStatusWidgetTest", () => {
       expect(orderStatusWidgetMenuItems.length).toEqual(entry.fields.length);
 
       for(let i = 0; i < entry.fields.length; i++) {
-        let colors = OrderUtils.getOrderStatusColor(entry.fields[i].description);
+        let processedOrderStatus = OrderUtils.processOrderStatus(entry.fields[i]);
+        let colors = OrderUtils.getOrderStatusColor(processedOrderStatus.description);
         expect(orderStatusWidgetMenuItems[i]).toHaveStyle({
           background: colors.background,
           color: colors.color
         });
+        expect(orderStatusWidgetMenuItems[i]).toHaveTextContent(processedOrderStatus.visibleText!);
       }
     });
   });

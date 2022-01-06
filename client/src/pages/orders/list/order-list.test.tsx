@@ -84,7 +84,7 @@ describe("OrderListTest", () => {
 
 
 
-  test("For missing token it should redirect to main page", async () => {
+  test("For missing token it should redirect to sign in page", async () => {
     render(
       <MemoryRouter initialEntries={["/orders"]}>
         <Routes>
@@ -94,7 +94,7 @@ describe("OrderListTest", () => {
     );
 
 
-    expect(mockedNavigate).toHaveBeenCalledWith('/');
+    expect(mockedNavigate).toHaveBeenCalledWith('/sign-in');
   });
 
 
@@ -235,7 +235,7 @@ describe("OrderListTest", () => {
       fireEvent.change(orderListFormFieldArea!, { target: { value: x.inputArea } })
       fireEvent.click(orderListServicePrice[0]);
 
-      expect(orderListTotalPrice).toHaveTextContent(`Łączna kwota: ${x.outputArea}zł`);
+      expect(orderListTotalPrice).toHaveTextContent(`Łączna kwota za pojedyńcze zamówienie: ${x.outputArea}zł`);
       fireEvent.click(orderListServicePrice[0]);
     });
   });

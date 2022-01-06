@@ -20,7 +20,7 @@ const testOrder = (order: Order): void => {
   expect(order.totalPrice).toBeGreaterThanOrEqual(0);
 
   if (order.employee == null)
-    expect(order.orderStatus).toStrictEqual({ orderStatusId: 1, description: "NEW" });
+    expect(order.orderStatus).toStrictEqual({ orderStatusId: 1, description: "NEW", visibleText: "Nowe" });
 
   if (order.orderStatus.orderStatusId != 1)
     expect(order.employee).not.toBeNull();

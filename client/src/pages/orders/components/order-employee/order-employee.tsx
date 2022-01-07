@@ -80,7 +80,7 @@ export function OrderEmployee(props: OrderEmployeeProps) {
             </DialogTitle>
             <List>
               {users.map(user => (
-                <ListItem button onClick={() => onChangeAssignment(user)} role="employee-assign-to-employee-list-item">
+                <ListItem key={"user-" + user.id} button onClick={() => onChangeAssignment(user)} role="employee-assign-to-employee-list-item">
                   <ListItemAvatar>
                     <Avatar sx={{ bgcolor: red[500] }}>
                       {user.firstName && user.firstName[0]}

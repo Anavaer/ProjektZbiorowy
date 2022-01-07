@@ -18,6 +18,9 @@
 ### Testy wydajnościowe API
 ![Testy wydajnościowe API](./Documentation/_netling_tests_results_2022-01-05_173147.jpg)
 
+### Testy jednostkowe aplikacji klienckiej
+![Testy jednostkowe aplikacji klienckiej](./Documentation/frontend__unit_test_results.png)
+
 ## Dane testowe
 
 ### Klienci:
